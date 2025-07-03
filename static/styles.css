@@ -1,0 +1,44 @@
+body {
+  background-color: #393E46;
+}
+
+/* <weight>: Use a value from 100 to 900 */
+
+.main-font {
+  font-family: "Work Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  color: #EEEEEE;
+}
+
+/* Set navbar styles */
+.navbar-style {
+  background-color: #222831 !important;
+  border-bottom: 1px solid #383d45 !important;
+}
+
+/* Set brand styles (logo) */
+.navbar-style .navbar-brand {
+  font-family: "Work Sans", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+  font-optical-sizing: auto;
+  color: #00ADB5 !important;
+  font-size: 1.8rem; /* bigger size for logo */
+}
+
+/* Set nav-link styles */
+.navbar-style .nav-link {
+  font-family: "Work Sans", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+  font-optical-sizing: auto;
+  color: #00ADB5 !important;
+  font-size: 1.1rem; /* smaller size for links */
+}
+
+.navbar-style .nav-link:hover {
+  color: #EEEEEE !important; /* Change color on hover */
+}
+
