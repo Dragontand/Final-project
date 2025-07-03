@@ -1,24 +1,22 @@
 import os
 
 from datetime import datetime
-from flask import Flask, flash, redirect, render_template, request, session
+from flask import Flask, flash, g, redirect, render_template, request, session
 from flask_session import Session
+import sqlite3
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from helpers import apology, login_required
 
 # Configure application
 app = Flask(__name__)
-app.debug = True
+if __name__ == "__main__":
+    app.run(debug=True)
 
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
-
-# Configure CS50 Library to use SQLite database
-#db = SQL("sqlite:///finance.db")
-
 
 @app.after_request
 def after_request(response):
@@ -52,9 +50,14 @@ def login():
         # Ensure password was submitted
         elif not request.form.get("password"):
             return apology("must provide password", 400)
+        
+        # Open database connection
+        db = get_db()
+        cursor = db.cursor()
 
         # Query database for username
-        rows = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))
+        cursor.execute("SELECT * FROM users WHERE username = ?", (request.form.get("username"),))
+        rows = cursor.fetchall()
 
         # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(
@@ -108,15 +111,23 @@ def register():
         # Check if password and repeated password are the same
         if request.form.get("password") != request.form.get("confirmation"):
             return apology("passwords must be the same", 400)
+        
+        # Open database connection
+        db = get_db()
+        cursor = db.cursor()
 
         # Check if username already is taken
         try:
-            rows = db.execute("INSERT INTO users (username, hash) VALUES(?, ?)", request.form.get(
-                "username"), generate_password_hash(request.form.get("password")))
+            #print("username: " + request.form.get("username") + " password: " + request.form.get("password"))
+            cursor.execute("INSERT INTO users (username, hash) VALUES(?, ?)", (request.form.get("username"), generate_password_hash(request.form.get("password"))))
         except ValueError:
             return apology("username already taken", 400)
-        except:
+        except Exception as error:
+            print("Error: ", error)
             return apology("general error", 400)
+
+        # Commit changes to the database
+        db.commit()
 
         # Redirect user to home page
         return redirect("/")
@@ -124,3 +135,17 @@ def register():
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("register.html")
+
+def get_db():
+    """Open a new database connection if there is not one opened yet."""
+    if "db" not in g:
+        g.db = sqlite3.connect("scheduly.db")
+        g.db.row_factory = sqlite3.Row
+    return g.db
+
+@app.teardown_appcontext
+def close_db(e=None):
+    """Close database at the end of the request"""
+    db = g.pop("db", None)
+    if db is not None:
+        db.close()
