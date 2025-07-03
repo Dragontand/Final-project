@@ -1,14 +1,15 @@
 Goals:
-✅
-1. Login/registration (per-user timetable)
+1. ✅ Make db
 
-2. View calendar using FullCalendar.js
+2. ✅ Login/registration (per-user timetable)
 
-3. Add/edit/delete events (stored in SQLite or PostgreSQL)
+3. View calendar using FullCalendar.js
 
-4. Filter by category (e.g. school/work/personal)
+4. Add/edit/delete events (stored in SQLite or PostgreSQL)
 
-5. Recurring events
+5. Filter by category (e.g. school/work/personal)
+
+6. Recurring events
 
 Optional: Share calendar with a link
 

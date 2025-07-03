@@ -135,6 +135,24 @@ def register():
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("register.html")
+    
+
+@app.route("/timetable", methods=["GET", "POST"])
+@login_required
+def timetable():
+    """Show timetable"""
+
+    # User reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+        
+
+        # Redirect user to home page
+        return redirect("/")
+
+    # User reached route via GET (as by clicking a link or via redirect)
+    else:
+        return render_template("timetable.html")
+
 
 def get_db():
     """Open a new database connection if there is not one opened yet."""
@@ -142,6 +160,7 @@ def get_db():
         g.db = sqlite3.connect("scheduly.db")
         g.db.row_factory = sqlite3.Row
     return g.db
+
 
 @app.teardown_appcontext
 def close_db(e=None):
