@@ -10,8 +10,6 @@ from helpers import apology, login_required
 
 # Configure application
 app = Flask(__name__)
-if __name__ == "__main__":
-    app.run(debug=True)
 
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_PERMANENT"] = False
@@ -168,3 +166,7 @@ def close_db(e=None):
     db = g.pop("db", None)
     if db is not None:
         db.close()
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
