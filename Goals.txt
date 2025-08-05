@@ -3,13 +3,19 @@ Goals:
 
 2. ✅ Login/registration (per-user timetable)
 
-3. View calendar using FullCalendar.js
+3. ✅ View calendar using FullCalendar.js
 
-4. Add/edit/delete events (stored in SQLite or PostgreSQL)
+4. Add events
 
-5. Filter by category (e.g. school/work/personal)
+5. edit/delete events)
 
-6. Recurring events
+6. store events in SQLite database and make possible to use CRUD
+
+7. Recurring events
+
+8. Add filters like filter by category (e.g. school/work/personal)
+
+Optional: Optimaize color-scheme
 
 Optional: Share calendar with a link
 
@@ -28,3 +34,11 @@ git commit -m "Commit message goes here"
     Saves tracked changes in the form of a commit.
 git push
     Pushes local commits to the remote repo.
+
+Run command:
+python app.py
+
+Recources:
+https://fullcalendar.io/
+https://bootstrap-datepicker.readthedocs.io/en/latest/index.html
+https://getbootstrap.com/
