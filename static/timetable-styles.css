@@ -4,6 +4,11 @@
   padding: 10px;
 }
 
+.fc a {
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
 .fc-event:hover {
   background-color: #00ADB5 !important; /* change background on hover */
   color: white !important;              /* change text color on hover */
