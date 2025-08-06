@@ -20,3 +20,189 @@
   background-color: #bebebe; /* light blue background on hover */
   cursor: pointer;
 }
+
+/* === Bootstrap Datepicker Dark Mode Patch === */
+/* Fixes for range selection, hover states, and dark theme support - Made with ChatGPT*/
+
+/* General faded text for other months */
+.datepicker td.old,
+.datepicker td.new {
+  color: #6c757d !important;
+}
+
+/* Fix old/new when selected */
+.datepicker td.old.range,
+.datepicker td.new.range,
+.datepicker td.old.range-start,
+.datepicker td.new.range-end {
+  color: #fff !important;
+}
+
+/* Selected range */
+.datepicker .range,
+.datepicker .range-start,
+.datepicker .range-end {
+  background-color: #5c636a !important;
+  color: #fff !important;
+}
+
+/* Range edges */
+.datepicker td.range-start,
+.datepicker td.range-end {
+  background-color: #0d6efd !important;
+  color: #fff !important;
+  border-radius: 0 !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+/* TODAY default */
+.datepicker td.today:not(.range-start):not(.range-end) {
+  background-color: #fd7e14 !important;
+  color: #fff !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+/* HOVER STATES — must override .today/.range-start/.range-end */
+.datepicker td.day:hover,
+.datepicker td.old.day:hover,
+.datepicker td.new.day:hover,
+.datepicker td.range:hover {
+  background-color: #2b3035 !important;
+  color: #fff !important;
+}
+
+/* HOVER on range start/end */
+.datepicker td.range-start:hover,
+.datepicker td.range-end:hover {
+  background-color: #0b5ed7 !important;
+  color: #fff !important;
+}
+
+/* Apply left side rounding to only the range-start */
+.datepicker td.range-start {
+  border-top-left-radius: 4px !important;
+  border-bottom-left-radius: 4px !important;
+}
+
+/* Apply right side rounding to only the range-end */
+.datepicker td.range-end {
+  border-top-right-radius: 4px !important;
+  border-bottom-right-radius: 4px !important;
+}
+
+/* HOVER on today only if it's not a range edge */
+.datepicker td.today:hover:not(.range-start):not(.range-end) {
+  background-color: #e96b0c !important;
+  color: #fff !important;
+}
+
+/* today + range-start hover */
+.datepicker td.today.range-start:hover,
+.datepicker td.today.range-end:hover {
+  background-color: #0b5ed7 !important;
+  color: #fff !important;
+}
+
+/* Footer buttons (Today / Clear) */
+.datepicker tfoot .today,
+.datepicker tfoot .clear {
+  background: transparent !important;
+  color: #f8f9fa !important;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.datepicker tfoot .today:hover,
+.datepicker tfoot .clear:hover {
+  background-color: #2b3035 !important;
+  color: #fff !important;
+}
+
+/* Navigation buttons */
+.datepicker .datepicker-switch,
+.datepicker .prev,
+.datepicker .next {
+  background: transparent !important;
+  color: #f8f9fa !important;
+  cursor: pointer;
+}
+.datepicker .datepicker-switch:hover,
+.datepicker .prev:hover,
+.datepicker .next:hover {
+  background-color: #2b3035 !important;
+  color: #fff !important;
+}
+
+/* View selector buttons */
+.datepicker .month,
+.datepicker .year,
+.datepicker .decade,
+.datepicker .century {
+  display: inline-block;
+  color: #e9ecef !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border-radius: 0.375rem;
+  padding: 4px 6px;
+  cursor: pointer;
+}
+.datepicker .month:hover,
+.datepicker .year:hover,
+.datepicker .decade:hover,
+.datepicker .century:hover {
+  background-color: #2b3035 !important;
+  color: #fff !important;
+}
+
+/* Active selector state */
+.datepicker .month.active,
+.datepicker .year.active,
+.datepicker .decade.active,
+.datepicker .century.active {
+  background-color: #0d6efd !important;
+  color: #fff !important;
+}
+.datepicker .month.active:hover,
+.datepicker .year.active:hover,
+.datepicker .decade.active:hover,
+.datepicker .century.active:hover {
+  background-color: #0b5ed7 !important;
+}
+
+/* Normalize all date cells */
+.datepicker td.day,
+.datepicker td.old.day,
+.datepicker td.new.day,
+.datepicker td.today,
+.datepicker td.range,
+.datepicker td.range-start,
+.datepicker td.range-end {
+  text-align: center;
+  vertical-align: middle;
+  padding: 6px !important;
+  width: 1.75rem !important;
+  height: 1.75rem !important;
+}
+
+.datepicker th.week,
+.datepicker td.week {
+  width: 2rem !important;
+  text-align: center;
+  color: #6c757d !important;
+}
+
+.datepicker .month,
+.datepicker .year,
+.datepicker .decade,
+.datepicker .century {
+  display: inline-flex !important;
+  justify-content: center;
+  align-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  text-align: center;
+  vertical-align: middle;
+  margin: 2px;
+}

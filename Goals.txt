@@ -7,7 +7,7 @@ Goals:
 
 4. Add events
 
-5. edit/delete events)
+5. edit/delete events
 
 6. store events in SQLite database and make possible to use CRUD
 
