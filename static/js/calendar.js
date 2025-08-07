@@ -53,12 +53,12 @@ document.addEventListener('DOMContentLoaded', function () {
     btn.setAttribute('type', 'button');
     btn.setAttribute('class', 'btn btn-primary fc-addEventbutton-button');
     btn.setAttribute('data-bs-toggle', 'modal');
-    btn.setAttribute('data-bs-target', '#Modal');
+    btn.setAttribute('data-bs-target', '#modal');
     btn.setAttribute('data-bs-name', 'New Event');
   }
 
   // Handles modal content updates
-  const Modal = document.getElementById('Modal');
+  const Modal = document.getElementById('modal');
   if (Modal) {
     Modal.addEventListener('show.bs.modal', event => {
       const button = event.relatedTarget;

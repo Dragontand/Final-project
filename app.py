@@ -142,7 +142,14 @@ def timetable():
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
+        print(request.form.get("modal-title"))
+        if not request.form.get("modal-title"):
+            flash("Title is required!", "danger")
+            return render_template("timetable.html", show_modal=True)
         
+        if len(request.form.get("description")) > 200:
+            flash("Discription is longer than 200 characters!", "danger")
+            return render_template("timetable.html", show_modal=True)
 
         # Redirect user to home page
         return redirect("/")

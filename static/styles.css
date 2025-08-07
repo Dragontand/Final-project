@@ -41,3 +41,22 @@ body {
 .navbar-style .nav-link:hover {
   color: #bebebe !important; /* Change color on hover */
 }
+
+.flash {
+  z-index: 1100 !important;
+  position: fixed; /* or sticky, or absolute - whatever fits */
+  top: 1rem; /* adjust as needed */
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.modal-title {
+  cursor: pointer;
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.modal-title-input {
+  display: none;
+  font-size: 1.25rem;
+}
