@@ -4,5 +4,13 @@ Element with focus: <button.btn-close btn-close-white ms-2>
 Ancestor with aria-hidden: <div.modal fade#modal> <div class=​"modal fade" id=​"modal" tabindex=​"-1" aria-labelledby=​"modalLabel" style=​"display:​ block;​" aria-hidden=​"true">​…​</div>​
 
 
-Work on data being passed on from Html to Python:
+✅ Work on data being passed on from Html to Python:
 https://chatgpt.com/s/t_68950a3363e481919f14e6a819b80378
+
+When first date selected automatically select 2nd date.
+
+Make inputs more protected against false inputs.
+
+Add categories.
+
+Add time selection.

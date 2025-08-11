@@ -1,12 +1,17 @@
 import os
 
-from datetime import datetime
+from datetime import date, datetime
 from flask import Flask, flash, g, redirect, render_template, request, session
 from flask_session import Session
 import sqlite3
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from helpers import apology, login_required
+
+def adapt_datetime(dt):
+    return dt.strftime("%Y-%m-%d %H:%M:%S")
+
+sqlite3.register_adapter(datetime, adapt_datetime)
 
 # Configure application
 app = Flask(__name__)
@@ -138,21 +143,64 @@ def register():
 @app.route("/timetable", methods=["GET", "POST"])
 @login_required
 def timetable():
-    """Show timetable"""
+    """Show timetable and add events"""
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
-        print(request.form.get("modal-title"))
-        if not request.form.get("modal-title"):
+        
+        title = request.form.get("title")
+        if not title:
             flash("Title is required!", "danger")
             return render_template("timetable.html", show_modal=True)
         
-        if len(request.form.get("description")) > 200:
+        description = request.form.get("description")
+        if len(description) > 200:
             flash("Discription is longer than 200 characters!", "danger")
             return render_template("timetable.html", show_modal=True)
+        
+        start_date = request.form.get("start-date")
+        end_date = request.form.get("end-date")
+        # Ensure start date exists
+        if not start_date and not end_date:
+            flash("Start & End date is required!", "danger")
+            return render_template("timetable.html", show_modal=True)
+        # Ensure start date exists
+        elif not start_date:
+            flash("Start date is required!", "danger")
+            return render_template("timetable.html", show_modal=True)
+        # Ensure end date exists
+        elif not end_date:
+            flash("End date is required!", "danger")
+            return render_template("timetable.html", show_modal=True)
+        
+        start_datetime = datetime.strptime(start_date, "%d/%m/%y").date()
+        end_datetime = datetime.strptime(end_date, "%d/%m/%y").date()
+        # Ensure dates are not in the past
+        if start_datetime < date.today() or end_datetime < date.today():
+            flash("Cannot plan in the past", "danger")
+            return render_template("timetable.html", show_modal=True)
+        
+        #ToDo: save the event and load into timetable
+        # Open database connection
+        db = get_db()
+        cursor = db.cursor()
+        
+        start_datetime = adapt_datetime(start_datetime)
+        end_datetime = adapt_datetime(end_datetime)
+        
+        try:
+            print("Test test")
+            cursor.execute("INSERT INTO events (user_id, title, description, start_datetime, end_datetime, category_id) VALUES(?, ?, ?, ?, ?, ?)", (session["user_id"], title, description, start_datetime, end_datetime, 0))
+        except Exception as error:
+            print("Error: ", error)
+            flash("HTTP 500 Internal server error", "danger")
+            return render_template("timetable.html", show_modal=False)
+        
+        # Commit changes to the database
+        db.commit()
 
-        # Redirect user to home page
-        return redirect("/")
+        # Redirect user to timetable
+        return redirect("/timetable")
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:

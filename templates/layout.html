@@ -87,8 +87,8 @@
                                 <!-- 2. Editable title container, separate from aria-labelledby -->
                                 <div class="d-flex align-items-left w-100">
                                     <div class="flex-grow-1">
-                                        <span class="modal-title" id="modal-title" onclick="editTitle()">New Event</span>
-                                        <input class="form-control form-control-sm modal-title-input" id="modal-title-input" type="text" onblur="saveTitle()" />
+                                        <span class="modal-title" id="modal-title">New Event</span>
+                                        <input class="form-control form-control-sm modal-title-input" id="modal-title-input" name="title" type="text"/>
                                     </div>
                                     <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
@@ -96,14 +96,14 @@
                             <div class="modal-body">
                                 <div class="mb-3">
                                     <label for="event-description" class="col-form-label">Description:</label>
-                                    <textarea class="form-control" id="event-description" maxlength="200"></textarea>
+                                    <textarea class="form-control" id="event-description" maxlength="200" name="description"></textarea>
                                 </div>
                                 <div class="mb-3">
                                     <label for="event-datepicker-start" class="col-form-label">Date:</label>
                                     <div class="input-daterange input-group" id="event-datepicker">
-                                        <input type="text" class="form-control-sm form-control" id="event-datepicker-start" name="start" />
+                                        <input type="text" class="form-control-sm form-control" id="event-datepicker-start" name="start-date" />
                                         <span class="input-group-text">to</span>
-                                        <input type="text" class="form-control-sm form-control" id="event-datepicker-end" name="end" />
+                                        <input type="text" class="form-control-sm form-control" id="event-datepicker-end" name="end-date" />
                                     </div>
                                 </div>
                             </div>
@@ -143,45 +143,7 @@
             }
         </script>
 
-        <script>
-            function editTitle() {
-                const span = document.getElementById('modal-title');
-                const input = document.getElementById('modal-title-input');
-                
-                input.value = span.textContent;
-                span.style.display = 'none';
-                input.style.display = 'inline-block';
-                input.focus();
-                input.select(); // select all text
-            }
-
-            function saveTitle() {
-                const span = document.getElementById('modal-title');
-                const input = document.getElementById('modal-title-input');
-
-                const newText = input.value.trim();
-                span.textContent = newText;
-                if (newText === "") {
-                    input.placeholder = "Title is required";
-                    input.classList.add('is-invalid');
-                    return;
-                }
-                input.classList.remove('is-invalid');
-                input.style.display = 'none';
-                span.style.display = 'inline';
-            }
-
-            // Save on Enter key
-            document.addEventListener('DOMContentLoaded', () => {
-                const input = document.getElementById('modal-title-input');
-                input.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault(); // prevent form submission
-                    input.blur();       // triggers saveTitle via onblur
-                }
-                });
-            });
-        </script>
+        <script type="module" src="{{ url_for('static', filename='js/modal.js') }}"></script>
 
 
         {% block script %}{% endblock %}
