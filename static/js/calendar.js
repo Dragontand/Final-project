@@ -11,39 +11,34 @@ document.addEventListener('DOMContentLoaded', function () {
     plugins: [dayGridPlugin, timeGridPlugin, listPlugin],
     initialView: 'dayGridMonth',
     selectable: true,
-            headerToolbar: {
-            left: 'prev,next today addEventbutton',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,listWeek,timeGridDay'
-            },
-            customButtons: {
-              addEventbutton: {
-                //icon: 'custom-icon-class',  Then style it in CSS
-                text: '+ Event',
-                click: function () {
-                  
-                }
-              }
-            },
-            events: [
-            { title: 'Event 1', start: '2025-08-20' },
-            { title: 'Event 2', start: '2025-08-20', end: '2025-08-23' }
-            ],
-            eventTimeFormat: { // like '14:30'
-                hour: '2-digit',
-                minute: '2-digit',
-                meridiem: false,
-                hour12: false
-            },
-            slotLabelFormat: { // like '14:30'
-                hour: '2-digit',
-                minute: '2-digit',
-                meridiem: false,
-                hour12: false
-            }
+    headerToolbar: {
+    left: 'prev,next today addEventbutton',
+    center: 'title',
+    right: 'dayGridMonth,timeGridWeek,listWeek,timeGridDay'
+    },
+    customButtons: {
+      addEventbutton: {
+        //icon: 'custom-icon-class',  Then style it in CSS
+        text: '+ Event',
+        click: function () {
+          
+        }
+      }
+    },
+    events: '/events',
+    eventTimeFormat: { // like '14:30'
+        hour: '2-digit',
+        minute: '2-digit',
+        meridiem: false,
+        hour12: false
+    },
+    slotLabelFormat: { // like '14:30'
+        hour: '2-digit',
+        minute: '2-digit',
+        meridiem: false,
+        hour12: false
+    }
   });
-
-  calendar.render();
 
   calendar.render();
 

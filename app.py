@@ -1,7 +1,6 @@
 import os
-
-from datetime import date, datetime
-from flask import Flask, flash, g, redirect, render_template, request, session
+from datetime import date, datetime, time, timedelta
+from flask import Flask, flash, g, jsonify, redirect, render_template, request, session
 from flask_session import Session
 import sqlite3
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -180,7 +179,6 @@ def timetable():
             flash("Cannot plan in the past", "danger")
             return render_template("timetable.html", show_modal=True)
         
-        #ToDo: save the event and load into timetable
         # Open database connection
         db = get_db()
         cursor = db.cursor()
@@ -188,13 +186,14 @@ def timetable():
         start_datetime = adapt_datetime(start_datetime)
         end_datetime = adapt_datetime(end_datetime)
         
+        # Save the event
         try:
-            print("Test test")
-            cursor.execute("INSERT INTO events (user_id, title, description, start_datetime, end_datetime, category_id) VALUES(?, ?, ?, ?, ?, ?)", (session["user_id"], title, description, start_datetime, end_datetime, 0))
+            cursor.execute("INSERT INTO events (user_id, title, description, start_datetime, end_datetime, category_id) VALUES(?, ?, ?, ?, ?, ?)"
+                           ,(session["user_id"], title, description, start_datetime, end_datetime, 0))
         except Exception as error:
             print("Error: ", error)
             flash("HTTP 500 Internal server error", "danger")
-            return render_template("timetable.html", show_modal=False)
+            return render_template("timetable.html")
         
         # Commit changes to the database
         db.commit()
@@ -206,6 +205,42 @@ def timetable():
     else:
         return render_template("timetable.html")
 
+
+@app.route("/events")
+@login_required
+def get_events():
+    """Show timetable and add events"""
+    
+    # Open database connection
+    db = get_db()
+    cursor = db.cursor()
+        
+    # Request all event data
+    try:
+        rows = cursor.execute("SELECT title, start_datetime, end_datetime FROM events WHERE user_id = ?", (session["user_id"],)).fetchall()
+    except Exception as error:
+        print("Error: ", error)
+        flash("HTTP 500 Internal server error", "danger")
+        return render_template("timetable.html", show_modal=True)
+    events = []
+    for title, start_dt, end_dt in rows:
+        if isinstance(end_dt, str):
+            end_dt = datetime.fromisoformat(end_dt)
+            
+        if end_dt:
+            if end_dt.time() == time(0, 0, 0):
+                end_dt += timedelta(days=1)
+            end_dt = str(end_dt)
+        else:
+            end_dt = None
+        
+        events.append({
+            "title": title,
+            "start": start_dt,                
+            "end": end_dt
+        })
+    return jsonify(events)
+    
 
 def get_db():
     """Open a new database connection if there is not one opened yet."""
