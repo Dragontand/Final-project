@@ -83,7 +83,6 @@
                             <div class="modal-header">
                                 <!-- 1. Accessibility label only -->
                                 <h1 id="modalLabel" class="visually-hidden">New Event</h1>
-
                                 <!-- 2. Editable title container, separate from aria-labelledby -->
                                 <div class="d-flex align-items-left w-100">
                                     <div class="flex-grow-1">
@@ -101,9 +100,9 @@
                                 <div class="mb-3">
                                     <label for="event-datepicker-start" class="col-form-label">Date:</label>
                                     <div class="input-daterange input-group" id="event-datepicker">
-                                        <input type="text" class="form-control-sm form-control" id="event-datepicker-start" name="start-date" />
+                                        <input autocomplete="off" type="text" class="form-control-sm form-control" id="event-datepicker-start" name="start-date" />
                                         <span class="input-group-text">to</span>
-                                        <input type="text" class="form-control-sm form-control" id="event-datepicker-end" name="end-date" />
+                                        <input autocomplete="off" type="text" class="form-control-sm form-control" id="event-datepicker-end" name="end-date" />
                                     </div>
                                 </div>
                             </div>

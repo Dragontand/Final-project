@@ -1,14 +1,14 @@
 import { Calendar } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
+import timeGridPlugin from '@fullcalendar/timegrid';
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
   const calendarEl = document.getElementById('calendar');
   if (!calendarEl) return; // Only run if the page has a calendar
 
   const calendar = new Calendar(calendarEl, {
-    plugins: [dayGridPlugin, timeGridPlugin, listPlugin],
+    plugins: [dayGridPlugin, listPlugin, timeGridPlugin],
     initialView: 'dayGridMonth',
     selectable: true,
     headerToolbar: {
@@ -20,9 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
       addEventbutton: {
         //icon: 'custom-icon-class',  Then style it in CSS
         text: '+ Event',
-        click: function () {
-          
-        }
+        click: function () {}
       }
     },
     events: '/events',
@@ -45,8 +43,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // Add Bootstrap modal attributes to the custom button
   const btn = document.querySelector('.fc-addEventbutton-button');
   if (btn) {
-    btn.setAttribute('type', 'button');
-    btn.setAttribute('class', 'btn btn-primary fc-addEventbutton-button');
     btn.setAttribute('data-bs-toggle', 'modal');
     btn.setAttribute('data-bs-target', '#modal');
     btn.setAttribute('data-bs-name', 'New Event');
@@ -57,11 +53,13 @@ document.addEventListener('DOMContentLoaded', function () {
   if (Modal) {
     Modal.addEventListener('show.bs.modal', event => {
       const button = event.relatedTarget;
-      const modalName = button.getAttribute('data-bs-name');
+      if (button) {
+        const modalName = button.getAttribute('data-bs-name');
 
-      const modalTitle = Modal.querySelector('.modal-title');
+        const modalTitle = Modal.querySelector('.modal-title');
 
-      modalTitle.textContent = modalName;
+        modalTitle.textContent = modalName;
+      }
     });
   }
 });

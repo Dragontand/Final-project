@@ -1,6 +1,29 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const titleSpan = document.getElementById("modal-title");
-  titleSpan.addEventListener("click", editTitle);
+    // Activate editTitle onclick
+    const titleSpan = document.getElementById('modal-title');
+    titleSpan.addEventListener("click", editTitle);
+    // Activate saveTitle onblur
+    const titleInput = document.getElementById("modal-title-input");
+    titleInput.value = "New Event"; // Default value
+    titleInput.addEventListener("blur", saveTitle);
+
+    // Save on Enter key
+    titleInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // prevent form submission
+            titleInput.blur();       // triggers saveTitle via onblur
+        }
+    });
+
+    const modalEl = document.getElementById('modal');
+    // This runs every time the modal is about to hide
+    modalEl.addEventListener('hide.bs.modal', () => {
+        const focused = document.activeElement;
+        // Check if the focused element is inside the modal
+        if (modalEl.contains(focused)) {
+            focused.blur(); // remove focus
+        }
+    });
 });
 
 function editTitle() {
@@ -14,17 +37,12 @@ function editTitle() {
     input.select(); // select all text
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const titleInput = document.getElementById("modal-title-input");
-  titleInput.addEventListener("blur", saveTitle);
-});
-
 function saveTitle() {
     const span = document.getElementById('modal-title');
     const input = document.getElementById('modal-title-input');
     const newText = input.value.trim();
     span.textContent = newText;
-    console.log("Saving title: ", input.value);
+    //console.log("Saving title: ", input.value);
     if (newText === "") {
         input.placeholder = "Title is required";
         input.classList.add('is-invalid');
@@ -34,15 +52,3 @@ function saveTitle() {
     input.style.display = 'none';
     span.style.display = 'inline';
 }
-
-// Save on Enter key
-document.addEventListener('DOMContentLoaded', () => {
-    const input = document.getElementById('modal-title-input');
-    input.value = "New Event"; // Default value
-    input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        e.preventDefault(); // prevent form submission
-        input.blur();       // triggers saveTitle via onblur
-    }
-    });
-});

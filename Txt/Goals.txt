@@ -5,19 +5,22 @@ Goals:
 
 3. ✅ View calendar using FullCalendar.js
 
-4. Add events
+4. ✅ Add events / store events in SQLite database
 
-5. edit/delete events
+5. edit/delete events / CRUD events in SQLite database
 
-6. store events in SQLite database and make possible to use CRUD
+6. 
 
 7. Recurring events
 
 8. Add filters like filter by category (e.g. school/work/personal)
 
-Optional: Optimaize color-scheme
+Optional 1: Share calendar with a link
 
-Optional: Share calendar with a link
+Optional 2: Add Boostrap placeholders
+https://getbootstrap.com/docs/5.3/components/placeholders/
+
+Optional 3: Optimaize color-scheme
 
 Setup GitHub:
 https://www.youtube.com/watch?v=cspx7YSvp5Q
