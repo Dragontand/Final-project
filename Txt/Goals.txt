@@ -7,20 +7,31 @@ Goals:
 
 4. ✅ Add events / store events in SQLite database
 
-5. edit/delete events / CRUD events in SQLite database
+5. Edit / delete events / CRUD events in SQLite database
 
-6. 
+6. Refill the forms when an error occurs.
 
-7. Recurring events
+7. Recurring events.
 
-8. Add filters like filter by category (e.g. school/work/personal)
+8. Add README.
 
-Optional 1: Share calendar with a link
+0. Add filters like filter by category (e.g. school/work/personal)9
 
-Optional 2: Add Boostrap placeholders
+Optional goals:
+
+1. Share calendar with a link / Google calendar integration -> https://fullcalendar.io/docs/google-calendar
+
+2. Add Boostrap placeholders
 https://getbootstrap.com/docs/5.3/components/placeholders/
 
-Optional 3: Optimaize color-scheme
+3. Optimaize color-scheme
+
+4. Consider UTC storage for datetimes and convert in the UI; or store a user timezone preference.
+
+5. Add ES6 -> https://fullcalendar.io/docs/initialize-es6
+
+Highly unlikely:
+Make / find universal db router.
 
 Setup GitHub:
 https://www.youtube.com/watch?v=cspx7YSvp5Q
