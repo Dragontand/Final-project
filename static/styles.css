@@ -60,3 +60,7 @@ body {
   display: none;
   font-size: 1.25rem;
 }
+
+#delete-event-button {
+  display: none;
+}
