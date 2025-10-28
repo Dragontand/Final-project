@@ -1,24 +1,31 @@
 Goals:
-1. ✅ Make db
+✅ 1. Database Set Up
 
-2. ✅ Login/registration (per-user timetable)
+✅ 2. Login/Registration System
 
-3. ✅ View calendar using FullCalendar.js
+✅ 3. Calendar View (Displaying FullCalendar)
 
-4. ✅ Add events / store events in SQLite database
+✅ 4. Add Events (Create)
 
-5. Edit / delete events / CRUD events in SQLite database
+🔲 5. Edit & Delete Events (Update & Delete) - This is your main priority now.
 
-6. Refill the forms when an error occurs.
+🔲 6. Write README.md - Essential for submitting your project.
 
-7. Recurring events.
 
-8. Add README.
+Strectch goals:
+Add categories
 
-0. Add filters like filter by category (e.g. school/work/personal)9
+Add time selection (instead of just dates)
 
-Optional goals:
+Bugfix: Solve the aria-hidden error
 
+Improve input validation
+
+Refill forms when an error occurs
+
+Recurring events
+
+Extra 's:
 1. Share calendar with a link / Google calendar integration -> https://fullcalendar.io/docs/google-calendar
 
 2. Add Boostrap placeholders
@@ -33,6 +40,10 @@ https://getbootstrap.com/docs/5.3/components/placeholders/
 Highly unlikely:
 Make / find universal db router.
 
+
+
+
+Handy to have:
 Setup GitHub:
 https://www.youtube.com/watch?v=cspx7YSvp5Q
 https://www.youtube.com/watch?v=9yzQCgIdL-Y
