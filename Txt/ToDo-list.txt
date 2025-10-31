@@ -1,3 +1,4 @@
-1. Backend: Implement "Delete Event"
-2. Backend: Implement "Edit Event"
-3. Documentation: README.md
+1. Backend: Implement "Edit Event".
+2. Backend: Implement "Delete Event".
+3. Add seperate errors with logging in for password and username.
+4. Documentation: README.md.
