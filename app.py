@@ -1,5 +1,5 @@
 import os
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, timedelta
 from flask import Flask, flash, g, jsonify, redirect, render_template, request, session
 from flask_session import Session
 import sqlite3
@@ -53,11 +53,13 @@ def login():
     if request.method == "POST":
         # Ensure username was submitted
         if not request.form.get("username"):
-            return apology("must provide username", 400)
+            flash("Must provide a username!", "danger")
+            return render_template("timetable.html", show_modal=True), 400
 
         # Ensure password was submitted
         elif not request.form.get("password"):
-            return apology("must provide password", 400)
+            flash("Must provide a password!", "danger")
+            return render_template("timetable.html", show_modal=True), 400
         
         # Open database connection
         db = get_db()
@@ -71,7 +73,8 @@ def login():
         if len(rows) != 1 or not check_password_hash(
             rows[0]["hash"], request.form.get("password")
         ):
-            return apology("invalid username and/or password", 403)
+            flash("Invalid username and or password!", "danger")
+            return render_template("timetable.html", show_modal=True), 400
 
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
@@ -107,21 +110,25 @@ def register():
         # Ensure username was submitted
         username = request.form.get("username")
         if not username:
-            return apology("must provide username", 400)
+            flash("Must provide a username!", "danger")
+            return render_template("timetable.html", show_modal=True), 400
 
         # Ensure password was submitted
         password = request.form.get("password")
         if not password:
-            return apology("must provide password", 400)
+            flash("Must provide a password!", "danger")
+            return render_template("timetable.html", show_modal=True), 400
 
         # Ensure repeated password was submitted
         confirmation = request.form.get("confirmation")
         if not confirmation:
-            return apology("must repeat password", 400)
+            flash("Must repeat password!", "danger")
+            return render_template("timetable.html", show_modal=True), 400
 
         # Check if password and repeated password are the same
         elif password != confirmation:
-            return apology("passwords must be the same", 400)
+            flash("Password must be the same!", "danger")
+            return render_template("timetable.html", show_modal=True), 400
         
         # Open database connection
         db = get_db()
@@ -132,10 +139,12 @@ def register():
             #print("username: " + request.form.get("username") + " password: " + request.form.get("password"))
             cursor.execute("INSERT INTO users (username, hash) VALUES(?, ?)", (username, generate_password_hash(password)))
         except sqlite3.IntegrityError:
-            return apology("username already taken", 400)
+            flash("Username already taken!", "danger")
+            return render_template("timetable.html", show_modal=True), 400
         except Exception as e:
             print("Error: ", e)
-            return apology("general error", 400)
+            flash("General error!", "danger")
+            return render_template("timetable.html", show_modal=True), 400
 
         # Commit changes to the database
         db.commit()
@@ -168,30 +177,48 @@ def get_events():
         
     # Request all event data
     try:
-        rows = cursor.execute("SELECT id, title, description, start_datetime, end_datetime FROM events WHERE user_id = ?", (session["user_id"],)).fetchall()
+        rows = cursor.execute("SELECT id, title, description, start_datetime, end_datetime FROM events WHERE user_id = ?",
+                              (session["user_id"],)).fetchall()
     except Exception as e:
         print("Error: ", e)
-        flash("HTTP 500 Internal server error", "danger")
+        flash("HTTP 500 Internal server error!", "danger")
         return render_template("timetable.html", show_modal=True)
     events = []
-    for id, title, description, start_dt, end_dt in rows:
-        if isinstance(end_dt, str):
-            end_dt = datetime.fromisoformat(end_dt)
-            
-        if end_dt:
-            if end_dt.time() == time(0, 0, 0):
-                end_dt += timedelta(days=1)
-            end_dt = str(end_dt)
-        else:
+    for id, title, description, start_dt_str, end_dt_str in rows:
+        try:
+            if start_dt_str:
+                start_dt = datetime.fromisoformat(start_dt_str)
+            else:
+                start_dt = None
+        except ValueError:
+            start_dt = None
+        try:
+            if end_dt_str:
+                end_dt = datetime.fromisoformat(end_dt_str)
+            else:
+                end_dt = None
+        except ValueError:
             end_dt = None
         
-        events.append({
+        # If the start date + 1 day is the same as the end date then set fullday to true
+        is_all_day = False
+        if (start_dt.date() + timedelta(days=1)) == end_dt.date():
+            is_all_day = True
+        
+        event = {
             "id": id,
             "title": title,
-            "description": description,
-            "start": start_dt,                
-            "end": end_dt
-        })
+            "extendedProps": {"description": description},
+            "start": str(start_dt),                
+            "end": str(end_dt)
+        }
+        
+        # Add the allDay property for Fullcalendar
+        if is_all_day:
+            event["allDay"] = True
+            
+        events.append(event)
+        #print(event.items())          
     return jsonify(events)
    
    
@@ -200,52 +227,20 @@ def get_events():
 def new_event():
     """Add events"""
 
-    title = request.form.get("title")
-    if not title:
-        flash("Title is required!", "danger")
-        return render_template("timetable.html", show_modal=True)
-        
-    description = request.form.get("description")
-    if len(description) > 200:
-        flash("Description is longer than 200 characters!", "danger")
-        return render_template("timetable.html", show_modal=True)
-        
-    start_date = request.form.get("start-date")
-    end_date = request.form.get("end-date")
-    # Ensure start date exists
-    if not start_date and not end_date:
-        flash("Start & End date is required!", "danger")
-        return render_template("timetable.html", show_modal=True)
-    # Ensure start date exists
-    elif not start_date:
-        flash("Start date is required!", "danger")
-        return render_template("timetable.html", show_modal=True)
-    # Ensure end date exists
-    elif not end_date:
-        flash("End date is required!", "danger")
-        return render_template("timetable.html", show_modal=True)
-        
-    start_datetime = datetime.strptime(start_date, "%d/%m/%y").date()
-    end_datetime = datetime.strptime(end_date, "%d/%m/%y").date()
-    # Ensure dates are not in the past
-    if start_datetime < date.today() or end_datetime < date.today():
-        flash("Cannot plan in the past", "danger")
-        return render_template("timetable.html", show_modal=True)
-        
+    # Run all checks
+    event = check_event()
+    
     # Open database connection
     db = get_db()
     cursor = db.cursor()
-        
-    start_datetime = adapt_datetime(start_datetime)
-    end_datetime = adapt_datetime(end_datetime)
-        
+    
     # Save the event
     try:
         cursor.execute("INSERT INTO events (user_id, title, description, start_datetime, end_datetime, category_id) VALUES(?, ?, ?, ?, ?, ?)"
-                        ,(session["user_id"], title, description, start_datetime, end_datetime, 1)) # 1 means uncategorized
+                        ,(session["user_id"], event["title"], event["description"], event["start_dt"], event["end_dt"], 1)) # 1 means uncategorized
     except Exception as e:
-        print("Error: ", e)
-        flash("HTTP 500 Internal server error", "danger")
+        print(e)
+        flash("HTTP 500 Internal server error!", "danger")
         return render_template("timetable.html"), 500
         
     # Commit changes to the database
@@ -254,12 +249,44 @@ def new_event():
     # Redirect user to timetable
     return redirect("/timetable")
 
-@app.route("/events/edit", methods=["POST"])
+
+@app.route("/events/edit/<int:event_id>", methods=["POST"])
 @login_required
-def edit_event():
+def edit_event(event_id):
     """Edit events"""
     
+    # Run all checks
+    edited_event = check_event()
+    
+    # Open database connection
+    db = get_db()
+    cursor = db.cursor()
+    
+    # Edit the event
+    try:
+        parameters = (
+            edited_event["title"],
+            edited_event["description"],
+            edited_event["start_dt"], 
+            edited_event["end_dt"], 
+            1,  # 1 means uncategorized
+            session["user_id"], 
+            event_id
+        )
+        
+        cursor.execute("UPDATE events SET title = ?, description = ?, start_datetime = ?, end_datetime = ?, category_id = ? WHERE user_id = ? AND id = ?"
+                        ,parameters)
+    except Exception as e:
+        print(e)
+        flash("HTTP 500 Internal server error!", "danger")
+        return render_template("timetable.html"), 500
+        
+    # Commit changes to the database
+    db.commit()
+
+    # Redirect user to timetable
     return redirect("/timetable")
+
     
 @app.route("/events/delete/<int:event_id>", methods=["DELETE"])
 @login_required
@@ -283,6 +310,56 @@ def delete_event(event_id):
         print(f"Error deleting event {event_id}: {e}")
         # Return a server error response
         return jsonify({"error": "Server error during deletion"}), 500
+
+
+def check_event():
+    event = {}
+    
+    title = request.form.get("title")
+    if not title:
+        flash("Title is required!", "danger")
+        return render_template("timetable.html", show_modal=True)
+    event["title"] = title
+     
+    description = request.form.get("description")
+    if len(description) > 200:
+        flash("Description is longer than 200 characters!", "danger")
+        return render_template("timetable.html", show_modal=True)
+    event["description"] = description
+        
+    start_date = request.form.get("start-date")
+    end_date = request.form.get("end-date")
+    # Ensure start date exists
+    if not start_date and not end_date:
+        flash("Start & End date is required!", "danger")
+        return render_template("timetable.html", show_modal=True)
+    # Ensure start date exists
+    elif not start_date:
+        flash("Start date is required!", "danger")
+        return render_template("timetable.html", show_modal=True)
+    # Ensure end date exists
+    elif not end_date:
+        flash("End date is required!", "danger")
+        return render_template("timetable.html", show_modal=True)
+    # Make start and end datetime into datetime objects
+    start_dt = datetime.strptime(start_date, "%d/%m/%y")
+    end_dt = datetime.strptime(end_date, "%d/%m/%y")
+    # Ensure dates are not in the past
+    if start_dt < datetime.today() or end_dt < datetime.today():
+        flash("Cannot plan in the past", "danger")
+        return render_template("timetable.html", show_modal=True)
+    
+    # Make end date follow the ICalendar specs
+    end_dt += timedelta(days=1)
+    # Make into isoformat strings
+    start_dt_str = start_dt.isoformat()
+    end_dt_str = end_dt.isoformat()
+    
+    # Add dates to event dict
+    event["start_dt"] = start_dt_str
+    event["end_dt"] = end_dt_str
+    
+    return event
 
 
 def get_db():
