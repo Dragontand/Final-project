@@ -4,9 +4,9 @@ import listPlugin from '@fullcalendar/list';
 import timeGridPlugin from '@fullcalendar/timegrid';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const calendarEl = document.getElementById('calendar');
+  const calendarEl = $('#calendar')[0]; // To remove Jquery wrapper for Fullcalendar
   if (!calendarEl) return; // Only run if the page has a calendar
-
+  resetModalForNew();
   const calendar = new Calendar(calendarEl, {
     // Config
     plugins: [dayGridPlugin, listPlugin, timeGridPlugin],
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
           resetModalForNew();
           
           // Trigger modal
-          const modalEl = document.getElementById('modal');
+          const modalEl = $('#modal');
           if (modalEl && window.bootstrap) {
               const bootstrapModal = bootstrap.Modal.getOrCreateInstance(modalEl);
               bootstrapModal.show();
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fillModalForEdit(event);
 
     // Show modal manually
-    const modalEl = document.getElementById('modal');
+    const modalEl = $('#modal');
     if (modalEl && window.bootstrap) {
         const bootstrapModal = bootstrap.Modal.getOrCreateInstance(modalEl);
         bootstrapModal.show();
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Handles modal content updates
-  const Modal = document.getElementById('modal');
+  const Modal = $('#modal')[0];
   if (Modal) {
     Modal.addEventListener('show.bs.modal', event => {
       const button = event.relatedTarget;
@@ -97,56 +97,64 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function resetModalForNew() {
-    const modalEl = document.getElementById('modal');
+    const modalEl = $('#modal');
     if (!modalEl) return;
     // Retrieve all input fields and empty them
-    modalEl.querySelector('#modal-title').value = 'New Event';
-    document.getElementById('event-description').value = '';
-    document.getElementById('event-datepicker-start').value = '';
-    document.getElementById('event-datepicker-end').value = '';
-    document.getElementById('event-id-input').value = '';
-    document.getElementById('delete-event-button').style.display = 'none';
-    document.getElementById('submit-event-button').textContent = 'Save event';
+    modalEl.find('#modal-title').text('New Event');
+    $('#event-description').val('');
+    $('#event-datepicker-start').val('');
+    $('#event-datepicker-end').val('');
+    $('#event-id-input').val('');
+    $('#delete-event-button').hide();
+    $('#submit-event-button').text('Save event');
 }
 
 function fillModalForEdit(event) {
-    const modalEl = document.getElementById('modal');
+    const modalEl = $('#modal');
     if (!modalEl) return;
 
     const formatOptions = {
-    weekday: 'short',  // ex: 'fri'
-    year: 'numeric',   // ex: '2006'
-    month: '2-digit',  // ex: '05'
-    day: '2-digit',    // ex: '04'
-    hour: '2-digit',   // ex: '03'
-    minute: '2-digit', // ex: '33'
-    timeZone: 'Europe/Amsterdam' // Specify time zone
+      day: '2-digit',    // ex: '05'
+      month: '2-digit',  // ex: '04'
+      year: 'numeric',   // ex: '2006'
+      //hour: '2-digit',   // ex: '03'
+      //minute: '2-digit', // ex: '33'
+      timeZone: 'Europe/Amsterdam' // Specify time zone
     };
 
     // Retrieve all editable fields
-    const form = document.getElementById('modal-form');
-    const titleSpan = modalEl.querySelector('#modal-title');
-    const descriptionTextarea = document.getElementById('event-description');
-    const startDateInput = document.getElementById('event-datepicker-start');
-    const endDateInput = document.getElementById('event-datepicker-end');
-    const eventIdInput = document.getElementById('event-id-input');
-    const deleteButton = document.getElementById('delete-event-button');
-    const submitButton = document.getElementById('submit-event-button');
+    const form = $('#modal-form');
+    const titleSpan = modalEl.find('#modal-title');
+    const descriptionTextarea = $('#event-description');
+    const startDateInput = $('#event-datepicker-start');
+    const endDateInput = $('#event-datepicker-end');
+    const eventIdInput = $('#event-id-input');
+    const deleteButton = $('#delete-event-button');
+    const submitButton = $('#submit-event-button');
 
     // Fill in the retrieved data for the editable fields
-    eventIdInput.value = event.id;
-    titleSpan.value = event.title;
-    descriptionTextarea.value = event.extendedProps.description || '';
+    eventIdInput.val(event.id);
+    titleSpan.text(event.title);
+    descriptionTextarea.val(event.extendedProps.description || '');
 
     // Counteract the specs of ICalendar for better visual representation
-    let endDate = event.end;
-    let newEndDate = endDate.setDate(endDate.getDate() - 1);
+    const startDate = event.start;
+    const endDate = event.end;
+    const newEndDate = endDate.setDate(endDate.getDate() - 1);
+
     // Format end date back and start date
     const customDutchFormat = new Intl.DateTimeFormat('nl-NL', formatOptions);
-    startDateInput.value = customDutchFormat.format(event.start);
-    endDateInput.value = customDutchFormat.format(newEndDate);
+    const fortmattedStartDate = customDutchFormat.format(startDate);
+    const formattedEndDate = customDutchFormat.format(endDate);
+    const formattedNewEndDate = customDutchFormat.format(newEndDate);
 
-    console.log('Start: ', event.start, 'End: ', event.end)
+    // Fill in the dates
+    startDateInput.val(fortmattedStartDate);
+    endDateInput.val(formattedNewEndDate);
+
+    // Fill in bootstrap-datepicker
+    $('#event-datepicker-start').datepicker('update', fortmattedStartDate);
+    $('#event-datepicker-end').datepicker('update', formattedEndDate);
 
     // Setup the modal and button for edit mode
     submitButton.textContent = 'Edit event';
@@ -154,7 +162,7 @@ function fillModalForEdit(event) {
     form.action = '/events/edit/' + event.id;
 
     // Setup the delete action
-    deleteButton.style.display = 'block';
+    deleteButton.show(); // In og Js .style.display = 'block'
     deleteButton.onclick = function() {
         if (confirm("Are you sude you want to delete it?")) {
             // Change route for deleting event
@@ -177,7 +185,7 @@ function fillModalForEdit(event) {
 }
 
 $('#event-datepicker').datepicker({
-    format: "dd/mm/yy",
+    format: "dd-mm-yyyy",
     weekStart: 1,
     startDate: 0,
     maxViewMode: 2,

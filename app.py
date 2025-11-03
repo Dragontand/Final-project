@@ -61,11 +61,11 @@ def login():
             flash("Must provide a password!", "danger")
             return render_template("timetable.html", show_modal=True), 400
         
-        # Open database connection
+        # Open db connection
         db = get_db()
         cursor = db.cursor()
 
-        # Query database for username
+        # Query db for username
         cursor.execute("SELECT * FROM users WHERE username = ?", (request.form.get("username"),))
         rows = cursor.fetchall()
 
@@ -130,7 +130,7 @@ def register():
             flash("Password must be the same!", "danger")
             return render_template("timetable.html", show_modal=True), 400
         
-        # Open database connection
+        # Open db connection
         db = get_db()
         cursor = db.cursor()
 
@@ -146,7 +146,7 @@ def register():
             flash("General error!", "danger")
             return render_template("timetable.html", show_modal=True), 400
 
-        # Commit changes to the database
+        # Commit changes to the db
         db.commit()
 
         # Redirect user to home page
@@ -171,7 +171,7 @@ def timetable():
 def get_events():
     """Show timetable and add events"""
     
-    # Open database connection
+    # Open db connection
     db = get_db()
     cursor = db.cursor()
         
@@ -182,7 +182,7 @@ def get_events():
     except Exception as e:
         print("Error: ", e)
         flash("HTTP 500 Internal server error!", "danger")
-        return render_template("timetable.html", show_modal=True)
+        return render_template("timetable.html", show_modal=True), 500
     events = []
     for id, title, description, start_dt_str, end_dt_str in rows:
         try:
@@ -230,7 +230,7 @@ def new_event():
     # Run all checks
     event = check_event()
     
-    # Open database connection
+    # Open db connection
     db = get_db()
     cursor = db.cursor()
     
@@ -243,7 +243,7 @@ def new_event():
         flash("HTTP 500 Internal server error!", "danger")
         return render_template("timetable.html"), 500
         
-    # Commit changes to the database
+    # Commit changes to the db
     db.commit()
 
     # Redirect user to timetable
@@ -258,7 +258,7 @@ def edit_event(event_id):
     # Run all checks
     edited_event = check_event()
     
-    # Open database connection
+    # Open db connection
     db = get_db()
     cursor = db.cursor()
     
@@ -281,7 +281,7 @@ def edit_event(event_id):
         flash("HTTP 500 Internal server error!", "danger")
         return render_template("timetable.html"), 500
         
-    # Commit changes to the database
+    # Commit changes to the db
     db.commit()
 
     # Redirect user to timetable
@@ -292,16 +292,26 @@ def edit_event(event_id):
 @login_required
 def delete_event(event_id):
     """Delete events"""
-    try:
+    
+    # Open db connection
+    db = get_db()
+    cursor = db.cursor()
+    try:   
         # 1 Find event in db
+        cursor.execute("SELECT user_id FROM events WHERE id = ?", (event_id,))
+        event = cursor.fetchone()
         
-        # 2. Check if the event exists
-        # if not event_to_delete:
-        #     return jsonify({"error": "Event not found"}), 404
+        # 2 Check if the event exists
+        if not event:
+            return jsonify({"error": "Event not found"}), 404
+        # 3 Check if the event is of the specified user
+        if event["user_id"] != session["user_id"]:
+            return jsonify({"error": "Unauthorized to delete this event"}), 403
         
-        # 3. Perform the deletion (e.g., db.session.delete(event_to_delete))
-        # 4 Commit to db
-        
+        # 4 Perform the deletion (e.g., db.session.delete(event_to_delete))
+        cursor.execute("DELETE FROM events WHERE id = ? AND user_id = ?", (event_id, session["user_id"]))
+        # 5 Commit changes to the db
+        db.commit()
         # Return a successful empty respone
         return '', 204
     
@@ -342,8 +352,8 @@ def check_event():
         flash("End date is required!", "danger")
         return render_template("timetable.html", show_modal=True)
     # Make start and end datetime into datetime objects
-    start_dt = datetime.strptime(start_date, "%d/%m/%y")
-    end_dt = datetime.strptime(end_date, "%d/%m/%y")
+    start_dt = datetime.strptime(start_date, "%d-%m-%Y")
+    end_dt = datetime.strptime(end_date, "%d-%m-%Y")
     # Ensure dates are not in the past
     if start_dt < datetime.today() or end_dt < datetime.today():
         flash("Cannot plan in the past", "danger")
@@ -363,7 +373,7 @@ def check_event():
 
 
 def get_db():
-    """Open a new database connection if there is not one opened yet."""
+    """Open a new db connection if there is not one opened yet."""
     if "db" not in g:
         g.db = sqlite3.connect("scheduly.db")
         g.db.row_factory = sqlite3.Row
@@ -373,7 +383,7 @@ def get_db():
 
 @app.teardown_appcontext
 def close_db(e=None):
-    """Close database at the end of the request"""
+    """Close db at the end of the request"""
     db = g.pop("db", None)
     if db is not None:
         db.close()
