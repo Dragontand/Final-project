@@ -7,7 +7,7 @@ Goals:
 
 ✅ 4. Add Events (Create)
 
-🔲 5. Edit & Delete Events (Update & Delete) - This is your main priority now.
+✅ 5. Edit & Delete Events (Update & Delete) - This is your main priority now.
 
 🔲 6. Write README.md - Essential for submitting your project.
 
