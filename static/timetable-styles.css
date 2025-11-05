@@ -1,5 +1,5 @@
 #calendar {
-  background-color: #222831;
+  background-color: var(--main-background-color);
   border-radius: 8px;
   padding: 10px;
 }
@@ -9,16 +9,32 @@
   text-decoration: none !important;
 }
 
+.fc-event {
+  background-color: var(--event-color) !important;
+  border: 1px solid var(--event-color) !important;
+}
+
 .fc-event:hover {
-  background-color: #00ADB5 !important; /* change background on hover */
-  color: white !important;              /* change text color on hover */
-  cursor: pointer;                      /* show pointer cursor */
-  box-shadow: 0 0 8px rgba(0, 173, 181, 0.7); /* subtle glow */
+  background-color: var(--main-blue) !important;
+  color: white !important;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(0, 173, 181, 0.7);
+}
+
+tr.fc-event:hover td {
+  background-color: var(--main-blue) !important;
+  color: white !important;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(0, 173, 181, 0.7);
 }
 
 .fc-daygrid-day:hover {
-  background-color: #bebebe; /* light blue background on hover */
+  background-color: var(--second-background-color);
   cursor: pointer;
+}
+
+.fc-list-day-cushion {
+  background-color: var(--second-background-color) !important;
 }
 
 /* === Bootstrap Datepicker Dark Mode Patch === */

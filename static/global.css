@@ -1,0 +1,23 @@
+:root {
+  /* Colors */
+  --event-color: #008a91;
+  --main-blue: #00adb5;
+  --second-blue: #33bdc4;
+  --third-blue: #66ced3;
+  --main-text-color: #fff;
+  --second-text-color: #cccccc;
+  --third-text-color: #999999;
+  --main-header-color: #222831;
+  --main-background-color: #1b2027;
+  --second-background-color: #222831;
+  --third-background-color: #4e535a;
+  /* Spacing */
+  /* Around 16px */
+  --full-spacing: clamp(10px, 0.8vw, 22px);
+  /* Around 12px */
+  --three-quarters-spacing: clamp(8px, 0.6vw, 18px);
+  /* Around 8px */
+  --half-spacing: clamp(5px, 0.4vw, 14px);
+  /* Around 4px */
+  --quarter-spacing: clamp(3px, 0.2vw, 10px);
+}

@@ -1,5 +1,5 @@
 body {
-  background-color: #393E46;
+  background-color: var(--third-background-color);
 }
 
 /* <weight>: Use a value from 100 to 900 */
@@ -9,43 +9,50 @@ body {
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
-  color: #FFFFFF;
+  color: var(--main-text-color);
 }
 
 /* Set navbar styles */
-.navbar-style {
-  background-color: #222831 !important;
-  border-bottom: 1px solid #383d45 !important;
+nav {
+  display: flex;
+  flex-direction: row;
+  background-color: var(--main-header-color) !important;
+
+  & ul {
+    display: flex;
+    justify-content: center;
+  }
 }
 
 /* Set brand styles (logo) */
-.navbar-style .navbar-brand {
+nav .navbar-brand {
   font-family: "Work Sans", sans-serif;
   font-weight: 800;
   font-style: normal;
   font-optical-sizing: auto;
-  color: #00ADB5 !important;
-  font-size: 1.8rem; /* bigger size for logo */
+  color: var(--main-blue) !important;
+  font-size: 1.8rem;
 }
 
 /* Set nav-link styles */
-.navbar-style .nav-link {
+nav .nav-link {
   font-family: "Work Sans", sans-serif;
   font-weight: 600;
   font-style: normal;
   font-optical-sizing: auto;
-  color: #00ADB5 !important;
-  font-size: 1.1rem; /* smaller size for links */
+  color: var(--main-blue) !important;
+  font-size: 1.1rem;
 }
 
-.navbar-style .nav-link:hover {
-  color: #bebebe !important; /* Change color on hover */
+nav .nav-link:hover,
+nav .navbar-brand:hover {
+  color: var(--third-blue) !important;
 }
 
 .flash {
   z-index: 1100 !important;
-  position: fixed; /* or sticky, or absolute - whatever fits */
-  top: 1rem; /* adjust as needed */
+  position: sticky;
+  top: var(--full-spacing);
   left: 50%;
   transform: translateX(-50%);
 }
