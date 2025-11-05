@@ -42,7 +42,6 @@ function saveTitle() {
     const input = document.getElementById('modal-title-input');
     const newText = input.value.trim();
     span.textContent = newText;
-    //console.log("Saving title: ", input.value);
     if (newText === "") {
         input.placeholder = "Title is required";
         input.classList.add('is-invalid');

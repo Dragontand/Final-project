@@ -15,9 +15,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Header toolbar
     headerToolbar: {
-    left: 'prev next today addEvent',
-    center: 'title',
-    right: 'dayGridMonth,timeGridWeek,listWeek,timeGridDay'
+      left: 'prev next today addEvent',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+    },
+
+    buttonText: {
+      today:    'Today',
+      month:    'Month',
+      week:     'Week',
+      day:      'Day',
+      list:     'List'
     },
 
     // Custom buttons
@@ -117,8 +125,6 @@ function fillModalForEdit(event) {
       day: '2-digit',    // ex: '05'
       month: '2-digit',  // ex: '04'
       year: 'numeric',   // ex: '2006'
-      //hour: '2-digit',   // ex: '03'
-      //minute: '2-digit', // ex: '33'
       timeZone: 'Europe/Amsterdam' // Specify time zone
     };
 
