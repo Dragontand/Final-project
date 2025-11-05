@@ -1,159 +1,247 @@
 <!DOCTYPE html>
 
 <html lang="en" data-bs-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, width=device-width" />
 
-    <head>
+    <!-- Favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
 
-        <meta charset="utf-8">
-        <meta name="viewport" content="initial-scale=1, width=device-width">
+    <!-- Boostrap css -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
 
-        <!-- Favicon -->
-         <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <!-- Boostrap datepicker css -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/css/bootstrap-datepicker.min.css"
+    />
 
+    <!-- Own stylesheets -->
+    <link href="/static/global.css" rel="stylesheet" />
+    <link href="/static/styles.css" rel="stylesheet" />
+    <link href="/static/timetable-styles.css" rel="stylesheet" />
 
-        <!-- Boostrap css -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <title>Scheduly: {% block title %}{% endblock %}</title>
+  </head>
 
-        <!-- Boostrap datepicker css -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/css/bootstrap-datepicker.min.css">
+  <body>
+    <nav class="navbar navbar-expand-md">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/"><span>Scheduly</span></a>
+        <button
+          aria-controls="navbar"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+          class="navbar-toggler"
+          data-bs-target="#navbar"
+          data-bs-toggle="collapse"
+          type="button"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbar">
+          {% if session["user_id"] %}
+          <ul class="navbar-nav me-auto mt-2">
+            <li class="nav-item">
+              <a class="nav-link" href="/timetable"><span>Timetable</span></a>
+            </li>
+          </ul>
+          <ul class="navbar-nav ms-auto mt-2">
+            <li class="nav-item">
+              <a class="nav-link" href="/logout">Log Out</a>
+            </li>
+          </ul>
+          {% else %}
+          <ul class="navbar-nav ms-auto mt-2">
+            <li class="nav-item">
+              <a class="nav-link" href="/register"><span>Register</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/login"><span>Log In</span></a>
+            </li>
+          </ul>
+          {% endif %}
+        </div>
+      </div>
+    </nav>
 
-        <!-- Own stylesheets -->
-        <link href="/static/styles.css" rel="stylesheet">
-        <link href="/static/timetable-styles.css" rel="stylesheet">
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div
+      class="position-fixed top-0 start-50 translate-middle-x mt-3 z-3 flash"
+      id="flash"
+    >
+      {% for category, message in messages %}
+      <div
+        class="alert alert-{{ category }} alert-dismissible fade show"
+        role="alert"
+      >
+        {{ message }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %} {% endwith %} {% block header %}{% endblock %}
 
-        <title>Scheduly: {% block title %}{% endblock %}</title>
+    <main class="container py-5 text-center">
+      {% block main %}{% endblock %}
+    </main>
 
-    </head>
+    <footer class="mb-5"></footer>
 
-    <body>
+    {% block modals %}
 
-        <nav class="navbar navbar-expand-md navbar-style">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="/"><span>Scheduly</span></a>
-                <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbar">
-                    {% if session["user_id"] %}
-                        <ul class="navbar-nav me-auto mt-2">
-                            <li class="nav-item"><a class="nav-link" href="/timetable"><span>Timetable</span></a></li>
-                        </ul>
-                        <ul class="navbar-nav ms-auto mt-2">
-                            <li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
-                        </ul>
-                    {% else %}
-                        <ul class="navbar-nav ms-auto mt-2">
-                            <li class="nav-item"><a class="nav-link" href="/register"><span>Register</span></a></li>
-                            <li class="nav-item"><a class="nav-link" href="/login"><span>Log In</span></a></li>
-                        </ul>
-                    {% endif %}
+    <div
+      class="modal fade"
+      id="modal"
+      tabindex="-1"
+      aria-labelledby="modalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form id="modal-form" action="/events/new" method="post">
+            <input type="hidden" id="event-id-input" name="event_id" value="" />
+            <div class="modal-header">
+              <!-- 1. Accessibility label only -->
+              <h1 id="modalLabel" class="visually-hidden">New Event</h1>
+              <!-- 2. Editable title container, separate from aria-labelledby -->
+              <div class="d-flex align-items-left w-100">
+                <div class="flex-grow-1">
+                  <span class="modal-title" id="modal-title">New Event</span>
+                  <input
+                    class="form-control form-control-sm modal-title-input"
+                    id="modal-title-input"
+                    name="title"
+                    type="text"
+                  />
                 </div>
+                <button
+                  type="button"
+                  class="btn-close btn-close-white ms-2"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
             </div>
-        </nav>
-
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="position-fixed top-0 start-50 translate-middle-x mt-3 z-3 flash" id="flash">
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="event-description" class="col-form-label"
+                  >Description:</label
+                >
+                <textarea
+                  class="form-control"
+                  id="event-description"
+                  maxlength="200"
+                  name="description"
+                ></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="event-datepicker-start" class="col-form-label"
+                  >Date:</label
+                >
+                <div class="input-daterange input-group" id="event-datepicker">
+                  <input
+                    autocomplete="off"
+                    type="text"
+                    class="form-control-sm form-control"
+                    id="event-datepicker-start"
+                    name="start-date"
+                  />
+                  <span class="input-group-text">to</span>
+                  <input
+                    autocomplete="off"
+                    type="text"
+                    class="form-control-sm form-control"
+                    id="event-datepicker-end"
+                    name="end-date"
+                  />
                 </div>
-            {% endif %}
-        {% endwith %}
-
-        {% block header %}{% endblock %}
-
-        <main class="container py-5 text-center">
-            {% block main %}{% endblock %}
-        </main>
-
-        <footer class="mb-5">
-            
-        </footer>
-
-        {% block modals %}
-
-            <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <form id="modal-form" action="/events/new" method="post">
-                            <input type="hidden" id="event-id-input" name="event_id" value="">
-                            <div class="modal-header">
-                                <!-- 1. Accessibility label only -->
-                                <h1 id="modalLabel" class="visually-hidden">New Event</h1>
-                                <!-- 2. Editable title container, separate from aria-labelledby -->
-                                <div class="d-flex align-items-left w-100">
-                                    <div class="flex-grow-1">
-                                        <span class="modal-title" id="modal-title">New Event</span>
-                                        <input class="form-control form-control-sm modal-title-input" id="modal-title-input" name="title" type="text"/>
-                                    </div>
-                                    <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                            </div>
-                            <div class="modal-body">
-                                <div class="mb-3">
-                                    <label for="event-description" class="col-form-label">Description:</label>
-                                    <textarea class="form-control" id="event-description" maxlength="200" name="description"></textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="event-datepicker-start" class="col-form-label">Date:</label>
-                                    <div class="input-daterange input-group" id="event-datepicker">
-                                        <input autocomplete="off" type="text" class="form-control-sm form-control" id="event-datepicker-start" name="start-date" />
-                                        <span class="input-group-text">to</span>
-                                        <input autocomplete="off" type="text" class="form-control-sm form-control" id="event-datepicker-end" name="end-date" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-danger me-auto" id="delete-event-button">Delete</button>
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary" id="submit-event-button">Save event</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+              </div>
             </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-danger me-auto"
+                id="delete-event-button"
+              >
+                Delete
+              </button>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                id="submit-event-button"
+              >
+                Save event
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
 
-            <!-- Auto-open modal on error in modal -->
-            {% if show_modal %}
-                <script>
-                    document.addEventListener('DOMContentLoaded', function () {
-                        const modalEl = document.getElementById('modal');
-                        if (modalEl) {
-                            const modal = new bootstrap.Modal.getOrCreateInstance(modalEl);
-                            modal.show();
-                        }
-                    });
-                </script>
-            {% endif %}
+    {% endblock %}
 
+    <!-- Fullcalendar importmap -->
+    <script type="importmap">
+      {
+        "imports": {
+          "@fullcalendar/core": "https://cdn.skypack.dev/@fullcalendar/core",
+          "@fullcalendar/daygrid": "https://cdn.skypack.dev/@fullcalendar/daygrid",
+          "@fullcalendar/timegrid": "https://cdn.skypack.dev/@fullcalendar/timegrid",
+          "@fullcalendar/list": "https://cdn.skypack.dev/@fullcalendar/list"
+        }
+      }
+    </script>
 
-        {% endblock %}
-        <!-- Fullcalendar importmap -->
-        <script type="importmap">
-            {
-                "imports": {
-                    "@fullcalendar/core": "https://cdn.skypack.dev/@fullcalendar/core",
-                    "@fullcalendar/daygrid": "https://cdn.skypack.dev/@fullcalendar/daygrid",
-                    "@fullcalendar/timegrid": "https://cdn.skypack.dev/@fullcalendar/timegrid",
-                    "@fullcalendar/list": "https://cdn.skypack.dev/@fullcalendar/list"
-                }
-            }
-        </script>
+    <!-- Own modal js -->
+    <script
+      type="module"
+      src="{{ url_for('static', filename='js/modal.js') }}"
+    ></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- Bootstrap js -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+    <!-- Bootstrap datepicker js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js"></script>
+    <!-- Own Fullcalender js -->
+    <script
+      type="module"
+      src="{{ url_for('static', filename='js/calendar.js') }}"
+    ></script>
 
-        <script type="module" src="{{ url_for('static', filename='js/modal.js') }}"></script>
-
-
-        {% block script %}{% endblock %}
-
-        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js"></script>
-        <script type="module" src="{{ url_for('static', filename='js/calendar.js') }}"></script>
-
-    </body>
-
+    {% block script %}
+    <!-- Auto-open modal on error in modal -->
+    {% if show_modal %}
+    <script>
+      const modalEl = $("#modal");
+      if (modalEl && window.bootstrap) {
+        const bootstrapModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        bootstrapModal.show();
+      }
+    </script>
+    {% endif %} {% endblock %}
+  </body>
 </html>
