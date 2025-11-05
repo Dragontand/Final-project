@@ -1,6 +1,6 @@
 import os
 from datetime import date, datetime, timedelta
-from flask import Flask, flash, g, jsonify, redirect, render_template, request, session
+from flask import Flask, flash, g, jsonify, redirect, render_template, request, session, url_for
 from flask_session import Session
 import sqlite3
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -53,13 +53,13 @@ def login():
     if request.method == "POST":
         # Ensure username was submitted
         if not request.form.get("username"):
-            flash("Must provide a username!", "danger")
-            return render_template("timetable.html", show_modal=True), 400
+            flash("HTTP error: 400 must provide a username!", "danger")
+            return render_template("timetable.html"), 400
 
         # Ensure password was submitted
         elif not request.form.get("password"):
-            flash("Must provide a password!", "danger")
-            return render_template("timetable.html", show_modal=True), 400
+            flash("HTTP error: 400 must provide a password!", "danger")
+            return render_template("timetable.html"), 400
         
         # Open db connection
         db = get_db()
@@ -70,11 +70,14 @@ def login():
         rows = cursor.fetchall()
 
         # Ensure username exists and password is correct
-        if len(rows) != 1 or not check_password_hash(
-            rows[0]["hash"], request.form.get("password")
-        ):
-            flash("Invalid username and or password!", "danger")
-            return render_template("timetable.html", show_modal=True), 400
+        if len(rows) != 1:
+            flash("HTTP error: 404 user not found!", "danger")
+            return render_template("timetable.html"), 404
+        
+        # Gives general error if passwords don't match
+        if not check_password_hash(rows[0]["hash"], request.form.get("password")):
+            flash("HTTP error: 400 invalid username and or password!", "danger")
+            return render_template("timetable.html"), 400
 
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
@@ -110,25 +113,25 @@ def register():
         # Ensure username was submitted
         username = request.form.get("username")
         if not username:
-            flash("Must provide a username!", "danger")
-            return render_template("timetable.html", show_modal=True), 400
+            flash("HTTP error: 400 must provide a username!", "danger")
+            return render_template("timetable.html"), 400
 
         # Ensure password was submitted
         password = request.form.get("password")
         if not password:
-            flash("Must provide a password!", "danger")
-            return render_template("timetable.html", show_modal=True), 400
+            flash("HTTP error: 400 must provide a password!", "danger")
+            return render_template("timetable.html"), 400
 
         # Ensure repeated password was submitted
         confirmation = request.form.get("confirmation")
         if not confirmation:
-            flash("Must repeat password!", "danger")
-            return render_template("timetable.html", show_modal=True), 400
+            flash("HTTP error: 400 must repeat password!", "danger")
+            return render_template("timetable.html"), 400
 
         # Check if password and repeated password are the same
         elif password != confirmation:
-            flash("Password must be the same!", "danger")
-            return render_template("timetable.html", show_modal=True), 400
+            flash("HTTP error: 400 password must be the same!", "danger")
+            return render_template("timetable.html"), 400
         
         # Open db connection
         db = get_db()
@@ -139,12 +142,12 @@ def register():
             #print("username: " + request.form.get("username") + " password: " + request.form.get("password"))
             cursor.execute("INSERT INTO users (username, hash) VALUES(?, ?)", (username, generate_password_hash(password)))
         except sqlite3.IntegrityError:
-            flash("Username already taken!", "danger")
-            return render_template("timetable.html", show_modal=True), 400
+            flash("HTTP error: 400 username already taken!", "danger")
+            return render_template("timetable.html"), 400
         except Exception as e:
             print("Error: ", e)
-            flash("General error!", "danger")
-            return render_template("timetable.html", show_modal=True), 400
+            flash("HTTP error: 500 internal server error!", "danger")
+            return render_template("timetable.html"), 500
 
         # Commit changes to the db
         db.commit()
@@ -162,11 +165,17 @@ def register():
 def timetable():
     """Show timetable"""
 
+    form_data = session.pop("form_data")
+    
+    form_data_exsists = False
+    if form_data is not None:
+        form_data_exsists = True
+    
     # User reached route via GET (as by clicking a link or via redirect)
-    return render_template("timetable.html")
+    return render_template("timetable.html", show_modal=form_data_exsists, form_data=form_data)
 
 
-@app.route("/events")
+@app.route("/events", methods=["GET"])
 @login_required
 def get_events():
     """Show timetable and add events"""
@@ -181,8 +190,8 @@ def get_events():
                               (session["user_id"],)).fetchall()
     except Exception as e:
         print("Error: ", e)
-        flash("HTTP 500 Internal server error!", "danger")
-        return render_template("timetable.html", show_modal=True), 500
+        flash("HTTP error: 500 internal server error!", "danger")
+        return render_template("timetable.html"), 500
     events = []
     for id, title, description, start_dt_str, end_dt_str in rows:
         try:
@@ -230,6 +239,12 @@ def new_event():
     # Run all checks
     event = check_event()
     
+    # If error return the error and store the form in the session
+    if event is None:
+        session["form_data"] = request.form
+        session["form_data"]["type"] = "new"
+        return redirect(url_for("timetable"))
+    
     # Open db connection
     db = get_db()
     cursor = db.cursor()
@@ -240,14 +255,15 @@ def new_event():
                         ,(session["user_id"], event["title"], event["description"], event["start_dt"], event["end_dt"], 1)) # 1 means uncategorized
     except Exception as e:
         print(e)
-        flash("HTTP 500 Internal server error!", "danger")
-        return render_template("timetable.html"), 500
+        flash("HTTP error: 500 internal server error!", "danger")
+        return render_template("timetable.html", show_modal=True), 500
         
     # Commit changes to the db
     db.commit()
 
+    flash("Event succesfully saved!", "success")
     # Redirect user to timetable
-    return redirect("/timetable")
+    return redirect("/timetable"), 205
 
 
 @app.route("/events/edit/<int:event_id>", methods=["POST"])
@@ -257,6 +273,12 @@ def edit_event(event_id):
     
     # Run all checks
     edited_event = check_event()
+    
+   # If error return the error and store the form in the session
+    if edited_event is None:
+        session["form_data"] = request.form
+        session["form_data"]["type"] = "edit"
+        return redirect(url_for("timetable"))
     
     # Open db connection
     db = get_db()
@@ -278,14 +300,14 @@ def edit_event(event_id):
                         ,parameters)
     except Exception as e:
         print(e)
-        flash("HTTP 500 Internal server error!", "danger")
-        return render_template("timetable.html"), 500
+        flash("HTTP error: 500 internal server error!", "danger")
+        return render_template("timetable.html", show_modal=True), 500
         
     # Commit changes to the db
     db.commit()
 
     # Redirect user to timetable
-    return redirect("/timetable")
+    return redirect("/timetable"), 205
 
     
 @app.route("/events/delete/<int:event_id>", methods=["DELETE"])
@@ -303,10 +325,10 @@ def delete_event(event_id):
         
         # 2 Check if the event exists
         if not event:
-            return jsonify({"error": "Event not found"}), 404
+            return jsonify({"HTTP error": "404 event not found!"}), 404
         # 3 Check if the event is of the specified user
         if event["user_id"] != session["user_id"]:
-            return jsonify({"error": "Unauthorized to delete this event"}), 403
+            return jsonify({"HTTP error": "403 unauthorized to delete this event!"}), 403
         
         # 4 Perform the deletion (e.g., db.session.delete(event_to_delete))
         cursor.execute("DELETE FROM events WHERE id = ? AND user_id = ?", (event_id, session["user_id"]))
@@ -319,7 +341,7 @@ def delete_event(event_id):
         # Log the error for debugging
         print(f"Error deleting event {event_id}: {e}")
         # Return a server error response
-        return jsonify({"error": "Server error during deletion"}), 500
+        return jsonify({"HTTP error": "500 server error during deletion"}), 500
 
 
 def check_event():
@@ -327,37 +349,37 @@ def check_event():
     
     title = request.form.get("title")
     if not title:
-        flash("Title is required!", "danger")
-        return render_template("timetable.html", show_modal=True)
+        flash("HTTP error: 400 title is required!", "danger")
+        return None
     event["title"] = title
      
     description = request.form.get("description")
     if len(description) > 200:
-        flash("Description is longer than 200 characters!", "danger")
-        return render_template("timetable.html", show_modal=True)
+        flash("HTTP error: 400 description is longer than 200 characters!", "danger")
+        return None
     event["description"] = description
         
     start_date = request.form.get("start-date")
     end_date = request.form.get("end-date")
     # Ensure start date exists
     if not start_date and not end_date:
-        flash("Start & End date is required!", "danger")
-        return render_template("timetable.html", show_modal=True)
+        flash("HTTP error: 400 start & End date is required!", "danger")
+        return None
     # Ensure start date exists
     elif not start_date:
-        flash("Start date is required!", "danger")
-        return render_template("timetable.html", show_modal=True)
+        flash("HTTP error: 400 start date is required!", "danger")
+        return None
     # Ensure end date exists
     elif not end_date:
-        flash("End date is required!", "danger")
-        return render_template("timetable.html", show_modal=True)
+        flash("HTTP error: 400 end date is required!", "danger")
+        return None
     # Make start and end datetime into datetime objects
     start_dt = datetime.strptime(start_date, "%d-%m-%Y")
     end_dt = datetime.strptime(end_date, "%d-%m-%Y")
     # Ensure dates are not in the past
     if start_dt < datetime.today() or end_dt < datetime.today():
-        flash("Cannot plan in the past", "danger")
-        return render_template("timetable.html", show_modal=True)
+        flash("HTTP error: 400 cannot plan in the past", "danger")
+        return None
     
     # Make end date follow the ICalendar specs
     end_dt += timedelta(days=1)
