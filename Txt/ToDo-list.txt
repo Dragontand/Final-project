@@ -4,9 +4,13 @@
 ✅4. Add seperate errors with logging in for password and username.
 ✅5. Polish the css.
 ✅6. Fix the show_modal setup for errors.
-🔲7. Adding fill ins for correct field when an error occurs.
-        7.1 Add the Jinja logic to the modal in layout.html so that the save data can be filled in.
-        7.2 Add a data attribuite to the modal in layout.html so that the js can pick it up.
-        7.3 Add the js needed to pickup what 7.2 stores in the html.
-🔲8. Split both login and register into 2 routers for get and post
+✅7. Adding fill ins for correct fields when an error occurs.
+        ✅7.1 Add the Jinja logic to the modal in layout.html so that the save data can be filled in.
+        ✅7.2 Add a data attribuite to the modal in layout.html so that the js can pick it up.
+        ✅7.3 Add the js needed to pickup what 7.2 stores in the html.
+✅8. Split both login and register into 2 routers for get and post
 🔲9. Documentation: README.md.
+
+
+User: Teacher.CS50
+Pass: John Harvard
