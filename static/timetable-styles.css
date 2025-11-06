@@ -28,6 +28,14 @@ tr.fc-event:hover td {
   box-shadow: 0 0 8px rgba(0, 173, 181, 0.7);
 }
 
+td.fc-day-today {
+  background-color: rgba(0, 173, 181, 0.5) !important;
+}
+
+td.fc-day-today:hover {
+  background-color: rgba(0, 173, 181, 0.7) !important;
+}
+
 .fc-daygrid-day:hover {
   background-color: var(--second-background-color);
   cursor: pointer;
@@ -38,7 +46,7 @@ tr.fc-event:hover td {
 }
 
 /* === Bootstrap Datepicker Dark Mode Patch === */
-/* Fixes for range selection, hover states, and dark theme support - Made with ChatGPT*/
+/* Fixes for range selection, hover states & dark theme support - Made with ChatGPT*/
 
 /* General faded text for other months */
 .datepicker td.old,

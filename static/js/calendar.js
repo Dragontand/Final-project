@@ -6,7 +6,6 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 document.addEventListener('DOMContentLoaded', () => {
   const calendarEl = $('#calendar')[0]; // To remove Jquery wrapper for Fullcalendar
   if (!calendarEl) return; // Only run if the page has a calendar
-  resetModalForNew();
   const calendar = new Calendar(calendarEl, {
     // Config
     plugins: [dayGridPlugin, listPlugin, timeGridPlugin],
@@ -45,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     },
+
     events: '/events',
 
     // Clicking on event
@@ -75,6 +75,20 @@ document.addEventListener('DOMContentLoaded', () => {
         minute: '2-digit',
         meridiem: false,
         hour12: false
+    },
+
+    eventsSet: function() {
+      const eventFormType = $('#event-form-type-input').val();
+      if (eventFormType === 'edit') {
+        // Get event Fullcalendar via id
+        const eventId = $('#event-id-input').val();
+        const curEvent = calendar.getEventById(eventId);
+        if (curEvent) {
+          // Clear the type so that it doesn't repeat itself
+          $('#event-form-type-input').val('');
+          editSetup(curEvent);
+        }
+      }
     }
   });
 
@@ -107,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function resetModalForNew() {
     const modalEl = $('#modal');
     if (!modalEl) return;
-    // Retrieve all input fields and empty them
+    // Retrieve all input fields & empty them
     modalEl.find('#modal-title').text('New Event');
     $('#event-description').val('');
     $('#event-datepicker-start').val('');
@@ -121,6 +135,7 @@ function fillModalForEdit(event) {
     const modalEl = $('#modal');
     if (!modalEl) return;
 
+    // 1. Setup date format
     const formatOptions = {
       day: '2-digit',    // ex: '05'
       month: '2-digit',  // ex: '04'
@@ -128,66 +143,81 @@ function fillModalForEdit(event) {
       timeZone: 'Europe/Amsterdam' // Specify time zone
     };
 
-    // Retrieve all editable fields
-    const form = $('#modal-form');
+    // 2. Retrieve all editable fields
     const titleSpan = modalEl.find('#modal-title');
     const descriptionTextarea = $('#event-description');
     const startDateInput = $('#event-datepicker-start');
     const endDateInput = $('#event-datepicker-end');
     const eventIdInput = $('#event-id-input');
-    const deleteButton = $('#delete-event-button');
-    const submitButton = $('#submit-event-button');
 
-    // Fill in the retrieved data for the editable fields
+    // 3. Fill in the retrieved data for the editable fields
     eventIdInput.val(event.id);
     titleSpan.text(event.title);
     descriptionTextarea.val(event.extendedProps.description || '');
 
-    // Counteract the specs of ICalendar for better visual representation
+    // 4. Counteract the specs of ICalendar for better visual representation
     const startDate = event.start;
     const endDate = event.end;
     const newEndDate = endDate.setDate(endDate.getDate() - 1);
 
-    // Format end date back and start date
+    // 5. Format end date back & start date
     const customDutchFormat = new Intl.DateTimeFormat('nl-NL', formatOptions);
     const fortmattedStartDate = customDutchFormat.format(startDate);
     const formattedEndDate = customDutchFormat.format(endDate);
     const formattedNewEndDate = customDutchFormat.format(newEndDate);
 
-    // Fill in the dates
+    // 6. Fill in the dates
     startDateInput.val(fortmattedStartDate);
     endDateInput.val(formattedNewEndDate);
 
-    // Fill in bootstrap-datepicker
+    // 7. Fill in bootstrap-datepicker
     $('#event-datepicker-start').datepicker('update', fortmattedStartDate);
     $('#event-datepicker-end').datepicker('update', formattedEndDate);
 
-    // Setup the modal and button for edit mode
-    submitButton.textContent = 'Edit event';
-    titleSpan.textContent = event.title;
-    form.action = '/events/edit/' + event.id;
+    // 8. Set up edit / delete mode
+    editSetup(event);
+}
 
-    // Setup the delete action
-    deleteButton.show(); // In og Js .style.display = 'block'
-    deleteButton.onclick = function() {
-        if (confirm("Are you sude you want to delete it?")) {
-            // Change route for deleting event
-            fetch('/events/delete/' + event.id, {
-                method: 'DELETE'
-            })
-            .then(response => {
+function editSetup(event) {
+    const deleteButton = $('#delete-event-button');
+    const submitButton = $('#submit-event-button');
+    const form = $('#modal-form');
+
+    if (!event) {
+      console.error('HTTP error: 404 could not find event!')
+      return;
+    }
+
+    // 2. Set up ui for edit / delete mode
+    submitButton.text('Edit event');
+    deleteButton.show();
+    form.attr('action', '/events/edit/' + event.id);
+
+    // 3. Delete handler
+    // .off() for deleting older handelers
+    deleteButton.off('click').on('click', function () {
+        if (confirm("Are you sure you want to delete it?")) {
+          fetch('/events/delete/' + event.id, {
+              method: 'DELETE'
+          })
+          .then(response => {
               if (response.ok) {
-                // Remove event and close modal
-                event.remove(); 
-                bootstrap.Modal.getInstance(modalEl).hide();
+                  // If we have the event obj, remove it from the ui
+                  if (event) {
+                      event.remove();
+                      const modalEl = document.getElementById('modal');
+                      bootstrap.Modal.getInstance(modalEl).hide();
+                  } else {
+                      // If we do not have the event obj, refresh the page to clear data
+                      window.location.reload();
+                  }
               } else {
-                console.error('Server error with deleting event:' + response.status);
-                alert('Error: Cannot delete event. Status: ' + response.status);
+                  console.error('Error: Cannot delete event. Status: ' + response.status);
               }
-            })
-            .catch(error => console.error('Error with deleting event: ' + error));
+          })
+          .catch(error => console.error('Error deleting event:', error));
         }
-    };
+    });
 }
 
 $('#event-datepicker').datepicker({

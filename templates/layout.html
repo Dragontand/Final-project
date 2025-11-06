@@ -71,8 +71,8 @@
       </div>
     </nav>
 
-    {% with messages = get_flashed_messages(with_categories=true) %} {% if
-    messages %}
+    {% with messages = get_flashed_messages(with_categories=true) %} 
+    {% if messages %}
     <div
       class="position-fixed top-0 start-50 translate-middle-x mt-3 z-3 flash"
       id="flash"
@@ -92,13 +92,16 @@
       </div>
       {% endfor %}
     </div>
-    {% endif %} {% endwith %} {% block header %}{% endblock %}
+    {% endif %} {% endwith %} 
+    {% block header %} {% endblock %}
 
     <main class="container py-5 text-center">
-      {% block main %}{% endblock %}
+      {% block main %} {% endblock %}
     </main>
 
-    <footer class="mb-5"></footer>
+    <footer class="mb-5">
+      {% block footer %} {% endblock %}
+    </footer>
 
     {% block modals %}
 
@@ -112,14 +115,29 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <form id="modal-form" action="/events/new" method="post">
-            <input type="hidden" id="event-id-input" name="event_id" value="" />
+            <input type="hidden" id="event-form-type-input" name="event-form-type" 
+            {%- if form_data -%}
+              value="{{ form_data['type'] }}"
+            {%- endif -%}
+            />
+            <input type="hidden" id="event-id-input" name="event-id" 
+            {%- if form_data and show_modal -%}
+              value="{{ form_data['event-id'] }}"
+            {%- endif -%}
+            />
             <div class="modal-header">
               <!-- 1. Accessibility label only -->
               <h1 id="modalLabel" class="visually-hidden">New Event</h1>
               <!-- 2. Editable title container, separate from aria-labelledby -->
               <div class="d-flex align-items-left w-100">
                 <div class="flex-grow-1">
-                  <span class="modal-title" id="modal-title">New Event</span>
+                  <span class="modal-title" id="modal-title">
+                    {%- if form_data and show_modal -%}
+                      {{ form_data['title'] }}
+                    {%- else -%}
+                      New Event
+                    {%- endif -%}
+                  </span>
                   <input
                     class="form-control form-control-sm modal-title-input"
                     id="modal-title-input"
@@ -145,7 +163,11 @@
                   id="event-description"
                   maxlength="200"
                   name="description"
-                ></textarea>
+                >
+                {%- if form_data and show_modal -%}
+                  {{ form_data['description'] }}
+                {%- endif -%}
+                </textarea>
               </div>
               <div class="mb-3">
                 <label for="event-datepicker-start" class="col-form-label"
@@ -158,6 +180,9 @@
                     class="form-control-sm form-control"
                     id="event-datepicker-start"
                     name="start-date"
+                    {%- if form_data and show_modal -%}
+                      value="{{ form_data['start-date'] }}"
+                    {%- endif -%}
                   />
                   <span class="input-group-text">to</span>
                   <input
@@ -166,6 +191,9 @@
                     class="form-control-sm form-control"
                     id="event-datepicker-end"
                     name="end-date"
+                    {%- if form_data and show_modal -%}
+                      value="{{ form_data['end-date'] }}"
+                    {%- endif -%}
                   />
                 </div>
               </div>
@@ -196,6 +224,7 @@
           </form>
         </div>
       </div>
+
     </div>
 
     {% endblock %}
