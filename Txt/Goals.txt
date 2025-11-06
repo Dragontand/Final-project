@@ -9,7 +9,9 @@ Goals:
 
 ✅ 5. Edit & Delete Events (Update & Delete) - This is your main priority now.
 
-🔲 6. Write README.md - Essential for submitting your project.
+🔲 6. Fix edit and delete so that they perform in an AJAX way with JS.
+
+🔲 7. Write README.md - Essential for submitting your project.
 
 Strectch goals:
 🔲 Add categories

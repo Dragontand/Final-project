@@ -291,7 +291,6 @@ def edit_event(event_id):
     if edited_event is None:
         session["form_data"] = request.form.to_dict()
         session["form_data"]["type"] = "edit"
-        print(session.items())
         return redirect(url_for("timetable"))
     
     # Open db connection
