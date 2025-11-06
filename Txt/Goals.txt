@@ -11,34 +11,31 @@ Goals:
 
 🔲 6. Write README.md - Essential for submitting your project.
 
-
 Strectch goals:
-Add categories
+🔲 Add categories
 
-Add time selection (instead of just dates)
+🔲 Add time selection (instead of just dates)
 
-Bugfix: Solve the aria-hidden error
+🔲 Improve input validation with Bootstrap
 
-Improve input validation
+✅ Refill forms when an error occurs
 
-Refill forms when an error occurs
-
-Recurring events
+🔲 Recurring events
 
 Extra 's:
-1. Share calendar with a link / Google calendar integration -> https://fullcalendar.io/docs/google-calendar
+🔲 1. Share calendar with a link / Google calendar integration -> https://fullcalendar.io/docs/google-calendar
 
-2. Add Boostrap placeholders
+🔲 2. Add Boostrap placeholders
 https://getbootstrap.com/docs/5.3/components/placeholders/
 
-3. Optimaize color-scheme
+✅ 3. Optimaize color-scheme
 
-4. Consider UTC storage for datetimes and convert in the UI; or store a user timezone preference.
+🔲 4. Consider UTC storage for datetimes and convert in the UI; or store a user timezone preference.
 
-5. Add ES6 -> https://fullcalendar.io/docs/initialize-es6
+🔲 5. Add ES6 -> https://fullcalendar.io/docs/initialize-es6
 
 Highly unlikely:
-Make / find universal db router.
+🔲 Make / find universal db router.
 
 
 
