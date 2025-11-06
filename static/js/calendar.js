@@ -52,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const event = info.event;
     
     fillModalForEdit(event);
+    setupModalForEdit(event);
 
     // Show modal manually
     const modalEl = $('#modal');
@@ -86,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (curEvent) {
           // Clear the type so that it doesn't repeat itself
           $('#event-form-type-input').val('');
-          editSetup(curEvent);
+          setupModalForEdit(curEvent);
         }
       }
     }
@@ -173,12 +174,9 @@ function fillModalForEdit(event) {
     // 7. Fill in bootstrap-datepicker
     $('#event-datepicker-start').datepicker('update', fortmattedStartDate);
     $('#event-datepicker-end').datepicker('update', formattedEndDate);
-
-    // 8. Set up edit / delete mode
-    editSetup(event);
 }
 
-function editSetup(event) {
+function setupModalForEdit(event) {
     const deleteButton = $('#delete-event-button');
     const submitButton = $('#submit-event-button');
     const form = $('#modal-form');
