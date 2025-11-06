@@ -183,6 +183,7 @@
                     {%- if form_data and show_modal -%}
                       value="{{ form_data['start-date'] }}"
                     {%- endif -%}
+                    required
                   />
                   <span class="input-group-text">to</span>
                   <input
@@ -194,6 +195,7 @@
                     {%- if form_data and show_modal -%}
                       value="{{ form_data['end-date'] }}"
                     {%- endif -%}
+                    required
                   />
                 </div>
               </div>

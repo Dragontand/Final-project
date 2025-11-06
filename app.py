@@ -47,6 +47,13 @@ def login_required(f):
     return decorated_function
 
 
+@app.route("/")
+@login_required
+def index():
+    """Show homepage"""
+    return render_template("index.html")
+
+
 @app.route("/login", methods=["GET"])
 def login_page():
     """Show login page"""
