@@ -1,6 +1,6 @@
 import os
 from datetime import datetime, timedelta
-from flask import Flask, flash, g, jsonify, redirect, render_template, request, session, url_for
+from flask import Flask, flash, g, jsonify, redirect, render_template, request, session, url_for, get_flashed_messages
 from flask_session import Session
 from functools import wraps
 import sqlite3
@@ -51,7 +51,8 @@ def login_required(f):
 @login_required
 def index():
     """Show homepage"""
-    return render_template("index.html")
+    # Send user to index / home page
+    return render_template("index.html"), 200
 
 
 @app.route("/login", methods=["GET"])
@@ -70,13 +71,11 @@ def login_user():
 
     # Ensure username was submitted
     if not request.form.get("username"):
-        flash("HTTP error: 400 must provide a username!", "danger")
-        return render_template("timetable.html"), 400
+        return jsonify({"error": "HTTP error: 400 must provide a username!"}), 400
 
     # Ensure password was submitted
     elif not request.form.get("password"):
-        flash("HTTP error: 400 must provide a password!", "danger")
-        return render_template("timetable.html"), 400
+        return jsonify({"error": "HTTP error: 400 must provide a password!"}), 400
         
     # Open db connection
     db = get_db()
@@ -86,15 +85,13 @@ def login_user():
     cursor.execute("SELECT * FROM users WHERE username = ?", (request.form.get("username"),))
     rows = cursor.fetchall()
 
-    # Ensure username exists & password is correct
+    # Ensure username exists
     if len(rows) != 1:
-        flash("HTTP error: 404 user not found!", "danger")
-        return render_template("timetable.html"), 404
-        
-    # Gives general error if passwords don't match
+        return jsonify({"error": "HTTP error: 404 user not found!"}), 404
+       
+    # Gives general error if passwords don't match, so it is not obviois which is wrong
     if not check_password_hash(rows[0]["hash"], request.form.get("password")):
-        flash("HTTP error: 400 invalid username and or password!", "danger")
-        return render_template("timetable.html"), 400
+        return jsonify({"error": "HTTP error: 400 invalid username and or password!"}), 400
 
     # Remember which user has logged in
     session["user_id"] = rows[0]["id"]
@@ -111,7 +108,7 @@ def logout():
     session.clear()
 
     # Redirect user to home page
-    return redirect("/")
+    return redirect("/"), 200
 
 
 @app.route("/register", methods=["GET"])
@@ -119,7 +116,7 @@ def register():
     """Show register page"""
     
     # Send user to register page
-    return render_template("register.html")
+    return render_template("register.html"), 200
     
     
 @app.route("/register/new", methods=["POST"])
@@ -132,25 +129,21 @@ def register_new():
     # Ensure username was submitted
     username = request.form.get("username")
     if not username:
-        flash("HTTP error: 400 must provide a username!", "danger")
-        return render_template("timetable.html"), 400
+        return jsonify({"error": "HTTP error: 400 must provide a username!"}), 400
 
     # Ensure password was submitted
     password = request.form.get("password")
     if not password:
-        flash("HTTP error: 400 must provide a password!", "danger")
-        return render_template("timetable.html"), 400
+        return jsonify({"error": "HTTP error: 400 must provide a password!"}), 400
 
     # Ensure repeated password was submitted
     confirmation = request.form.get("confirmation")
     if not confirmation:
-        flash("HTTP error: 400 must repeat password!", "danger")
-        return render_template("timetable.html"), 400
+        return jsonify({"error": "HTTP error: 400 must repeat password!"}), 400
 
-    # Check if password & repeated password are the same
+    # Check if password and repeated password are the same
     elif password != confirmation:
-        flash("HTTP error: 400 password must be the same!", "danger")
-        return render_template("timetable.html"), 400
+        return jsonify({"error": "HTTP error: 400 password must be the same!"}), 400
         
     # Open db connection
     db = get_db()
@@ -171,22 +164,16 @@ def register_new():
     db.commit()
 
     # Redirect user to home page
-    return redirect("/")
+    return redirect("/"), 200
     
 
 @app.route("/timetable", methods=["GET"])
 @login_required
 def timetable():
     """Show timetable"""
-
-    form_data = session.pop("form_data", None)
-    
-    form_data_exsists = False
-    if form_data is not None:
-        form_data_exsists = True
     
     # User reached route via GET (as by clicking a link or via redirect)
-    return render_template("timetable.html", show_modal=form_data_exsists, form_data=form_data)
+    return render_template("timetable.html"), 200
 
 
 @app.route("/events", methods=["GET"])
@@ -204,8 +191,7 @@ def get_events():
                               (session["user_id"],)).fetchall()
     except Exception as e:
         print("Error: ", e)
-        flash("HTTP error: 500 internal server error!", "danger")
-        return render_template("timetable.html"), 500
+        return jsonify({"error": "HTTP error: 500 internal server error!"}), 500
     events = []
     for id, title, description, start_dt_str, end_dt_str in rows:
         try:
@@ -240,8 +226,9 @@ def get_events():
         if is_all_day:
             event["allDay"] = True
             
-        events.append(event)     
-    return jsonify(events)
+        events.append(event) 
+    # Send events to Js    
+    return jsonify(events), 200
    
    
 @app.route("/events/new", methods=["POST"])
@@ -252,11 +239,16 @@ def new_event():
     # Run all checks
     event = check_event()
     
-    # If error return the error & store the form in the session
+    # If there was an error return it to Js
     if event is None:
-        session["form_data"] = request.form.to_dict()
-        session["form_data"]["type"] = "new"
-        return redirect(url_for("timetable"))
+        # Retrieve the flash message from check_event()
+        messages = get_flashed_messages(with_categories=True)
+        if messages:
+            error_msg = messages[0][1] 
+        else:
+            error_msg = "Invalid input"
+        # Sen back as JSON with error code 400
+        return jsonify({"error": error_msg}), 400
     
     # Open db connection
     db = get_db()
@@ -267,16 +259,14 @@ def new_event():
         cursor.execute("INSERT INTO events (user_id, title, description, start_datetime, end_datetime, category_id) VALUES(?, ?, ?, ?, ?, ?)"
                         ,(session["user_id"], event["title"], event["description"], event["start_dt"], event["end_dt"], 1)) # 1 means uncategorized
     except Exception as e:
-        print(e)
-        flash("HTTP error: 500 internal server error!", "danger")
-        return render_template("timetable.html", show_modal=True), 500
+        print("Error: ", e)
+        return jsonify({"error": "HTTP error: 500 internal server error!"}), 500
         
     # Commit changes to the db
     db.commit()
 
-    flash("Event succesfully saved!", "success")
-    # Redirect user to timetable
-    return redirect("/timetable"), 205
+    # Send succes to Js
+    return jsonify({"success": True}), 200
 
 
 @app.route("/events/edit/<int:event_id>", methods=["POST"])
@@ -287,11 +277,16 @@ def edit_event(event_id):
     # Run all checks
     edited_event = check_event()
     
-    # If error return the error & store the form in the session
+    # If there was an error return it to Js
     if edited_event is None:
-        session["form_data"] = request.form.to_dict()
-        session["form_data"]["type"] = "edit"
-        return redirect(url_for("timetable"))
+        # Retrieve the flash message from check_event()
+        messages = get_flashed_messages(with_categories=True)
+        if messages:
+            error_msg = messages[0][1] 
+        else:
+            error_msg = "Invalid input"
+        # Sen back as JSON with error code 400
+        return jsonify({"error": error_msg}), 400
     
     # Open db connection
     db = get_db()
@@ -312,15 +307,14 @@ def edit_event(event_id):
         cursor.execute("UPDATE events SET title = ?, description = ?, start_datetime = ?, end_datetime = ?, category_id = ? WHERE user_id = ? AND id = ?"
                         ,parameters)
     except Exception as e:
-        print(e)
-        flash("HTTP error: 500 internal server error!", "danger")
-        return render_template("timetable.html", show_modal=True), 500
+        print("Error: ", e)
+        return jsonify({"error": "HTTP error: 500 internal server error!"}), 500
         
     # Commit changes to the db
     db.commit()
 
-    # Redirect user to timetable
-    return redirect("/timetable"), 205
+    # Send succes to Js
+    return jsonify({"success": True}), 200
 
     
 @app.route("/events/delete/<int:event_id>", methods=["DELETE"])
@@ -354,7 +348,7 @@ def delete_event(event_id):
         # Log the error for debugging
         print(f"Error deleting event {event_id}: {e}")
         # Return a server error response
-        return jsonify({"HTTP error": "500 server error during deletion"}), 500
+        return jsonify({"error": "HTTP error: 500 internal server error!"}), 500
 
 
 def check_event():
@@ -376,7 +370,7 @@ def check_event():
     end_date = request.form.get("end-date")
     # Ensure start date exists
     if not start_date and not end_date:
-        flash("HTTP error: 400 start & End date is required!", "danger")
+        flash("HTTP error: 400 start and End date is required!", "danger")
         return None
     # Ensure start date exists
     elif not start_date:
