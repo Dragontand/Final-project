@@ -8,8 +8,11 @@
         ✅ 7.1 Add the Jinja logic to the modal in layout.html so that the save data can be filled in.
         ✅ 7.2 Add a data attribuite to the modal in layout.html so that the JS can pick it up.
         ✅ 7.3 Add the JS needed to pickup what 7.2 stores in the html.
-✅ 8. Split both login and register into 2 routers for get and post
-🔲 9. Documentation: README.md.
+✅ 8. Split both login and register into 2 routers for get and post/
+✅ 9. Made program fully AJAX in Pyhton and Js/
+🔲 10. Add AJAX in Js for login and register in their respective Js files.
+🔲 11. Documentation: README.md.
+🔲 12. Film video and upload everything.
 
 
 User: Teacher.CS50

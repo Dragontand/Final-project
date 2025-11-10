@@ -9,9 +9,15 @@ Goals:
 
 ✅ 5. Edit & Delete Events (Update & Delete) - This is your main priority now.
 
-🔲 6. Fix edit and delete so that they perform in an AJAX way with JS.
+✅ 6. Fix edit and delete so that they perform in an AJAX way with JS.
 
-🔲 7. Write README.md - Essential for submitting your project.
+✅ 7. Made program fully AJAX in Pyhton and Js.
+
+🔲 8. Add AJAX in Js for login and register in their respective Js files.
+
+🔲 9. Write README.md - Essential for submitting your project.
+
+🔲 10. Film video and upload everything.
 
 Strectch goals:
 🔲 Add categories
