@@ -161,12 +161,11 @@ def register_new():
     try:
         cursor.execute("INSERT INTO users (username, hash) VALUES(?, ?)", (username, generate_password_hash(password)))
     except sqlite3.IntegrityError:
-        flash("HTTP error: 400 username already taken!", "danger")
-        return render_template("timetable.html"), 400
+        print("Error: Username has already beeen taken.")
+        return jsonify({"error": "HTTP error: 400 username already taken!"}), 400
     except Exception as e:
         print("Error: ", e)
-        flash("HTTP error: 500 internal server error!", "danger")
-        return render_template("timetable.html"), 500
+        return jsonify({"error": "HTTP error: 500 internal server error!"}), 500
 
     # Commit changes to the db
     db.commit()

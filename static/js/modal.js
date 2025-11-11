@@ -184,7 +184,7 @@ export function setupModalForUD(calender, event) {
     e.preventDefault();
     const formData = new FormData(formEl);
     fetch("/events/edit/" + event.id, {
-      method: "PUT",
+      method: "POST",
       body: formData,
     })
       .then(async (response) => {

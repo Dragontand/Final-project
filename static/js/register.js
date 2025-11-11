@@ -6,7 +6,7 @@ $(function () {
   $registerButton.off("click").on("click", function (e) {
     // Makes it so that the normal action is not run
     e.preventDefault();
-    const formEl = $("#login-form")[0];
+    const formEl = $("#register-form")[0];
     const formData = new FormData(formEl);
     fetch("/register/new", {
       method: "POST",
