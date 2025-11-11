@@ -2,7 +2,12 @@
 
 ### **Github:** [Repository](https://github.com/Dragontand/Final-project)
 
-### Video Demo: `<PLAK HIER JE VIDEO URL>`
+### CS50 Login:
+
+* **Username:** Teacher.CS50
+* **Password:** John Harvard
+
+### Video Demo: [Video](https://www.youtube.com/watch?v=Z0EIswk4fk0)
 
 ## Description
 
