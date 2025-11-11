@@ -1,20 +1,13 @@
-{% extends "layout.html" %}
-
-{% block title %}
-    Home
-{% endblock %}
-
+{% extends "layout.html" %} 
+{% block title %} Home {% endblock %} 
 {% block main %}
 
-    <p class="main-font">
-        Welcome to Scheduly, your personal scheduling assistant!<br>
-        Here you can create and manage your timetable with ease.
-    </p>
+<img src="{{ url_for('static', filename='images/android-chrome-512x512.png') }}" alt="Scheduly Logo" class="index-logo" width="200">
+<p class="main-font">
+  Welcome to Scheduly, your personal scheduling assistant!<br />
+  Here you can create and manage your timetable with ease.
+</p>
 
 {% endblock %}
-
-{% block script %}
-
-    
-
-{% endblock %}
+{% block modals %} {% endblock %} 
+{% block script %} {% endblock %}

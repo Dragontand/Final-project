@@ -12,7 +12,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import listPlugin from "@fullcalendar/list";
 import timeGridPlugin from "@fullcalendar/timegrid";
 
-document.addEventListener("DOMContentLoaded", () => {
+$(function() {
   // To remove Jquery wrapper for Fullcalendar
   const calendarEl = $("#calendar")[0];
   // Only run if the page has a calendar
@@ -94,26 +94,11 @@ document.addEventListener("DOMContentLoaded", () => {
   calendar.render();
 
   // Add Bootstrap modal attributes to the custom button
-  const btn = document.querySelector(".fc-addEvent-button");
-  if (btn) {
-    btn.setAttribute("data-bs-toggle", "modal");
-    btn.setAttribute("data-bs-target", "#modal");
-    btn.setAttribute("data-bs-name", "New Event");
-  }
-
-  // Handles modal content updates
-  const modalEl = $("#modal")[0];
-  if (modalEl) {
-    modalEl.addEventListener("show.bs.modal", (event) => {
-      const buttonEl = event.relatedTarget;
-      if (buttonEl) {
-        const modalName = buttonEl.getAttribute("data-bs-name");
-
-        const modalTitle = modalEl.querySelector(".modal-title");
-
-        modalTitle.textContent = modalName;
-      }
-    });
+  const $btn = $(".fc-addEvent-button");
+  if ($btn) {
+    $btn.attr("data-bs-toggle", "modal");
+    $btn.attr("data-bs-target", "#modal");
+    $btn.attr("data-bs-name", "New Event");
   }
 });
 

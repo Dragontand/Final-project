@@ -1,9 +1,15 @@
-{% extends "layout.html" %} 
-{% block title %} Timetable {% endblock %} 
+{% extends "layout.html" %}
+{% block title %} Timetable {% endblock %}
 {% block main %}
 
 <div class="main-font" id="calendar"></div>
 
 {% endblock %} 
-{% block modals %} {{ super() }} {% endblock %} 
-{% block script %} {{ super() }} {% endblock %}
+{% block modals %} {{ super() }} {% endblock %}
+{% block script %}
+<!-- Own Fullcalender js -->
+<script
+  type="module"
+  src="{{ url_for('static', filename='js/calendar.js') }}"
+></script>
+{% endblock %}

@@ -58,8 +58,12 @@ def index():
 @app.route("/login", methods=["GET"])
 def login_page():
     """Show login page"""
-    # Send user to login page
-    return render_template("login.html")
+    
+    # Send user to login page or homepage
+    if session.get("user_id") is None:
+        return render_template("login.html"), 200
+    else:
+        return redirect(url_for("index"))
     
 
 @app.route("/login", methods=["POST"])
@@ -95,9 +99,9 @@ def login_user():
 
     # Remember which user has logged in
     session["user_id"] = rows[0]["id"]
-
+    
     # Redirect user to home page
-    return redirect("/")
+    return redirect(url_for("index"))
 
 
 @app.route("/logout")
@@ -108,15 +112,19 @@ def logout():
     session.clear()
 
     # Redirect user to home page
-    return redirect("/"), 200
+    return redirect(url_for("index"))
 
 
 @app.route("/register", methods=["GET"])
 def register():
     """Show register page"""
     
-    # Send user to register page
-    return render_template("register.html"), 200
+    # Send user to register or home page
+    if session.get("user_id") is None:
+        return render_template("register.html"), 200
+    else:
+        return redirect(url_for("index"))
+
     
     
 @app.route("/register/new", methods=["POST"])
@@ -164,7 +172,7 @@ def register_new():
     db.commit()
 
     # Redirect user to home page
-    return redirect("/"), 200
+    return redirect(url_for("index"))
     
 
 @app.route("/timetable", methods=["GET"])
@@ -173,7 +181,7 @@ def timetable():
     """Show timetable"""
     
     # User reached route via GET (as by clicking a link or via redirect)
-    return render_template("timetable.html"), 200
+    return render_template("timetable.html")
 
 
 @app.route("/events", methods=["GET"])

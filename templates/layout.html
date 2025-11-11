@@ -222,11 +222,7 @@
       }
     </script>
 
-    <!-- Own modal js -->
-    <script
-      type="module"
-      src="{{ url_for('static', filename='js/modal.js') }}"
-    ></script>
+    <!-- Jquery Js -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <!-- Bootstrap js -->
     <script
@@ -236,22 +232,14 @@
     ></script>
     <!-- Bootstrap datepicker js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js"></script>
-    <!-- Own Fullcalender js -->
+    
+    <!-- Own js -->
     <script
       type="module"
-      src="{{ url_for('static', filename='js/calendar.js') }}"
+      src="{{ url_for('static', filename='js/modal.js') }}"
     ></script>
 
-    {% block script %}
-    <!-- Auto-open modal on error in modal -->
-    {% if show_modal %}
-    <script>
-      const modalEl = $("#modal");
-      if (modalEl && window.bootstrap) {
-        const bootstrapModal = bootstrap.Modal.getOrCreateInstance(modalEl);
-        bootstrapModal.show();
-      }
-    </script>
-    {% endif %} {% endblock %}
+    {% block script %} {% endblock %}
+
   </body>
 </html>

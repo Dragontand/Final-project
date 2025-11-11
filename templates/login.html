@@ -1,7 +1,7 @@
 {% extends "layout.html" %} 
 {% block title %} Log In {% endblock %} 
 {% block main %}
-<form action="/login" method="post">
+<form id="login-form" action="/login" method="post">
   <div class="mb-3">
     <input
       autocomplete="off"
@@ -10,7 +10,6 @@
       name="username"
       placeholder="Username"
       type="text"
-      required
     />
   </div>
   <div class="mb-3">
@@ -19,10 +18,17 @@
       name="password"
       placeholder="Password"
       type="password"
-      required
     />
   </div>
-  <button class="btn btn-primary" type="submit">Log In</button>
+  <button class="btn btn-primary" type="submit"if id="submit-login-button">
+    Log In
+  </button>
 </form>
 {% endblock %} 
-{% block script %} {% endblock %}
+{% block modals %} {% endblock %}
+{% block script %}
+<script
+  type="module"
+  src="{{ url_for('static', filename='js/login.js') }}"
+></script>
+{% endblock %}

@@ -57,6 +57,11 @@ nav .navbar-brand:hover {
   transform: translateX(-50%);
 }
 
+.index-logo {
+  border: 1px solid rgba(0, 0, 0, 0);
+  border-radius: var(--three-quarters-spacing);
+}
+
 .modal-title {
   cursor: pointer;
   font-size: 1.25rem;

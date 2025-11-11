@@ -1,28 +1,28 @@
 import { showFlash } from "./flash.js";
 
-document.addEventListener("DOMContentLoaded", () => {
+$(function() {
   // Activate editTitle onclick
-  const titleSpan = document.getElementById("modal-title");
-  titleSpan.addEventListener("click", editTitle);
+  const $titleSpan = $("#modal-title");
+  $titleSpan.on("click", editTitle);
   // Activate saveTitle onblur
-  const titleInput = document.getElementById("modal-title-input");
-  titleInput.value = "New Event";
-  titleInput.addEventListener("blur", saveTitle);
+  const $titleInput = $("#modal-title-input");
+  $titleInput.val("New Event");
+  $titleInput.on("blur", saveTitle);
 
   // Save on Enter key
-  titleInput.addEventListener("keydown", (e) => {
+  $titleInput.on("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      titleInput.blur();
+      $titleInput.blur();
     }
   });
 
-  const modalEl = document.getElementById("modal");
+  const $modalEl = $("#modal");
   // This runs every time the modal is about to hide
-  modalEl.addEventListener("hide.bs.modal", () => {
+  $modalEl.on("hide.bs.modal", () => {
     const focused = document.activeElement;
     // Check if the focused element is inside the modal
-    if (modalEl.contains(focused)) {
+    if ($modalEl[0].contains(focused)) {
       focused.blur();
     }
   });
@@ -30,29 +30,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Titel functions
 function editTitle() {
-  const span = document.getElementById("modal-title");
-  const input = document.getElementById("modal-title-input");
+  const $span = $("#modal-title");
+  const $input = $("#modal-title-input");
 
-  input.value = span.textContent;
-  span.style.display = "none";
-  input.style.display = "inline-block";
-  input.focus();
-  input.select(); // select all text
+  $input.val($span.text().trim());
+  $span.css("display", "none");
+  $input.css("display", "inline-block");
+
+  $input.focus();
+  $input.select();
 }
 
 function saveTitle() {
-  const span = document.getElementById("modal-title");
-  const input = document.getElementById("modal-title-input");
-  const newText = input.value.trim();
-  span.textContent = newText;
-  if (newText === "") {
-    input.placeholder = "Title is required";
-    input.classList.add("is-invalid");
+  const $titelSpan = $("#modal-title");
+  const $titleInput = $("#modal-title-input");
+  const newTitle = $titleInput.val().trim();
+
+  $titelSpan.text(newTitle);
+  if (newTitle === "") {
+    $titleInput.attr("placeholder", "Title is required");
+    $titleInput.addClass("is-invalid");
     return;
   }
-  input.classList.remove("is-invalid");
-  input.style.display = "none";
-  span.style.display = "inline";
+  $titleInput.removeClass("is-invalid");
+  $titleInput.css("display", "none");
+  $titelSpan.css("display", "inline");
 }
 
 // Modal functions
@@ -123,8 +125,8 @@ export function setupModalForCreate(calendar) {
   $submitButtonEl.off("click").on("click", function (e) {
     // Makes it so that the normal action is not run
     e.preventDefault();
-    const $formEl = $("#modal-form")[0];
-    const formData = new FormData($formEl);
+    const formEl = $("#modal-form")[0];
+    const formData = new FormData(formEl);
     fetch("/events/new", {
       method: "POST",
       body: formData,
@@ -157,7 +159,7 @@ export function setupModalForCreate(calendar) {
 export function setupModalForUD(calender, event) {
   const $deleteButtonEl = $("#delete-event-button");
   const $submitButtonEl = $("#submit-event-button");
-  const $formEl = $("#modal-form")[0];
+  const formEl = $("#modal-form")[0];
 
   // 1. Check if parameters are not null
   if (!calender) {
@@ -180,9 +182,9 @@ export function setupModalForUD(calender, event) {
   // .off() for deleting older handelers
   $submitButtonEl.off("click").on("click", function (e) {
     e.preventDefault();
-    const formData = new FormData($formEl);
+    const formData = new FormData(formEl);
     fetch("/events/edit/" + event.id, {
-      method: "POST",
+      method: "PUT",
       body: formData,
     })
       .then(async (response) => {
