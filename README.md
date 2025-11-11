@@ -1,5 +1,7 @@
 # Scheduly
 
+### **Github:** [Repository](https://github.com/Dragontand/Final-project)
+
 ### Video Demo: `<PLAK HIER JE VIDEO URL>`
 
 ## Description
@@ -16,17 +18,21 @@ To run this project locally, follow these steps:
 
 1. **Clone the repository** **or download the source code.**
 2. **Set up a virtual environment:**
+
    ```bash
    python -m venv .venv
    ```
 3. **Activate the environment:**
+
    * Windows (PowerShell): `.\.venv\Scripts\Activate.ps1`
    * macOS/Linux: `source .venv/bin/activate`
 4. **Install dependencies:**
+
    ```bash
    pip install -r requirements.txt
    ```
 5. **Run the application:**
+
    ```bash
    flask run
    ```
